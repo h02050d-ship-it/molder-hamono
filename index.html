@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>モルダー刃物 使用量管理</title>
+<style>
+  :root{
+    --bg:#f4efe6;--card:#fff;--ink:#2b2620;--sub:#8a8175;--line:#e6ded0;
+    --accent:#b5651d;--accent-d:#8f4f16;--dan:#1565c0;--reset:#c62828;
+    --common:#6a1b9a;--date:#1565c0;--warn:#c62828;--shadow:0 1px 2px rgba(0,0,0,.1);
+    --ok:#2e7d32;--soon:#f9a825;--near:#ef6c00;--over:#c62828;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+  header{position:sticky;top:0;z-index:10;background:var(--accent);color:#fff;
+    padding:7px 12px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between}
+  header h1{font-size:14px;margin:0;font-weight:700}
+  header .hbtns{display:flex;gap:5px}
+  header .gear{background:rgba(255,255,255,.18);border:0;color:#fff;font-size:14px;width:30px;height:30px;border-radius:8px;cursor:pointer}
+  .wrap{max-width:560px;margin:0 auto;padding:7px 9px 36px}
+  .status{font-size:11px;color:var(--sub);text-align:center;margin:2px 0 5px;min-height:13px}
+  .label{font-size:11px;color:var(--sub);font-weight:700;margin:9px 3px 4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px;margin-bottom:7px;box-shadow:var(--shadow)}
+  .addcard{border:2px solid var(--accent);background:#fffaf3}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px}
+  .chip{border:2px solid var(--line);background:#fff;border-radius:9px;padding:8px 0;width:50px;text-align:center;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer}
+  .chip.on{border-color:var(--accent);background:#ffe9d3;color:var(--accent-d)}
+  .lenrow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px}
+  .lenbtn{border:2px solid var(--line);background:#fff;border-radius:9px;padding:8px 0;font-size:14px;font-weight:800;cursor:pointer}
+  .lenbtn.on{border-color:var(--accent);background:#ffe9d3;color:var(--accent-d)}
+  .ihint{font-size:10.5px;color:var(--sub);font-weight:700;margin-bottom:4px}
+  .io{display:flex;align-items:center;gap:7px}
+  .sval{flex:1;width:100%;text-align:center;font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;border:2px solid var(--line);border-radius:10px;padding:8px 0;background:#fff;color:var(--ink)}
+  .sval:focus{outline:none;border-color:var(--accent);background:#fffaf3}
+  .io .su{font-size:12px;color:var(--sub);font-weight:700}
+  .io .orv{font-size:10.5px;color:var(--sub);font-weight:700}
+  .selbox{position:relative;flex:1.1}
+  .selbox select{width:100%;padding:11px;border:2px solid var(--line);border-radius:10px;font-size:16px;font-weight:800;background:#fff;color:var(--ink);appearance:none;-webkit-appearance:none}
+  .selbox::after{content:"\25BC";position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:10px;pointer-events:none}
+  .preview{font-size:11px;color:var(--accent-d);margin:7px 2px 0;min-height:14px;line-height:1.4}
+  .addbtn{width:100%;margin-top:7px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px;font-size:16px;font-weight:800;cursor:pointer}
+  .addbtn:active{filter:brightness(.92)}
+  .addbtn:disabled{background:#cbb8a3}
+  .note{background:#fff4e6;border:1px solid #f0c98a;border-radius:9px;padding:7px 10px;font-size:11px;line-height:1.45;color:#7a5418;margin-bottom:7px}
+  .note b{color:var(--warn)}
+  .acc{position:relative}
+  .acc.common{border:1.5px solid var(--common);background:#faf5fd}
+  .acc.st-soon{border:1.5px solid var(--soon);background:#fffdf2}
+  .acc.st-near{border:1.5px solid var(--near);background:#fff7ef}
+  .acc.st-over{border:2px solid var(--over);background:#fff2f2;animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,0)}50%{box-shadow:0 0 0 4px rgba(198,40,40,.16)}}
+  .top{display:flex;align-items:baseline;justify-content:space-between;gap:7px}
+  .nm{font-size:13px;font-weight:800}
+  .nm .tag{font-size:9px;color:#fff;border-radius:5px;padding:1px 5px;margin-left:4px;vertical-align:middle}
+  .tag.cm{background:var(--common)}
+  .tag.so{background:var(--soon)}
+  .tag.ne{background:var(--near)}
+  .tag.ov{background:var(--over)}
+  .nums{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+  .nums .n{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .nums .nt{color:var(--accent-d)}
+  .nums .nd{color:var(--dan)}
+  .gbar{height:7px;background:#eee3d2;border-radius:5px;overflow:hidden;margin:7px 0 5px}
+  .gbar .fill{height:100%;border-radius:5px;transition:width .2s}
+  .bot{display:flex;align-items:center;justify-content:space-between;gap:7px}
+  .guide{font-size:11px;font-weight:700;line-height:1.25;color:var(--sub)}
+  .guide b{font-size:12.5px}
+  .resetbtn{flex:none;background:#fff;color:var(--reset);border:1.5px solid var(--reset);border-radius:8px;padding:6px 11px;font-size:11.5px;font-weight:800;cursor:pointer}
+  .resetbtn.hot{background:var(--over);color:#fff}
+  .delcard{position:absolute;top:7px;right:7px;background:var(--reset);color:#fff;border:0;border-radius:6px;width:25px;height:25px;font-size:13px;cursor:pointer;display:none;z-index:2}
+  .editbtn{position:absolute;top:7px;right:37px;background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:6px;width:25px;height:25px;font-size:12px;cursor:pointer;display:none;z-index:2}
+  .editmode .delcard,.editmode .editbtn{display:block}
+  .dc{display:flex;align-items:center;justify-content:space-between;gap:7px}
+  .dc .nm2{font-size:13px;font-weight:700}
+  .dc .v{font-size:17px;font-weight:800;color:var(--date);font-variant-numeric:tabular-nums}
+  .date-btns{display:flex;gap:5px;margin-top:6px}
+  .date-btns button{flex:1;border-radius:8px;padding:7px;font-size:12px;font-weight:700;cursor:pointer}
+  .today{background:var(--date);color:#fff;border:0}
+  .pick{background:#fff;color:var(--date);border:1.5px solid var(--date);position:relative;overflow:hidden}
+  .pick input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .admin{display:none;background:#fff7ec;border:1px dashed var(--accent);border-radius:10px;padding:10px;margin-bottom:9px}
+  .admin.show{display:block}
+  .admin h3{margin:0 0 6px;font-size:12px;color:var(--accent-d)}
+  .admin select,.admin input{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin-bottom:6px;background:#fff}
+  .admin .add{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px;font-size:13px;font-weight:700;width:100%;cursor:pointer}
+  .foot{font-size:10px;color:var(--sub);text-align:center;margin-top:10px;line-height:1.45}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;align-items:center;justify-content:center;padding:13px}
+  .overlay.show{display:flex}
+  .modal{background:#fff;border-radius:13px;max-width:520px;width:100%;max-height:86vh;overflow:auto;padding:15px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+  .modal h2{font-size:15px;margin:0 0 4px;color:var(--accent-d)}
+  .modal h3{font-size:12.5px;margin:12px 0 3px;color:var(--accent-d);border-left:3px solid var(--accent);padding-left:7px}
+  .modal p{font-size:12px;line-height:1.55;margin:3px 0}
+  .modal ul{margin:3px 0;padding-left:17px}
+  .modal li{font-size:12px;line-height:1.6}
+  .modal .close{margin-top:13px;width:100%;background:var(--accent);color:#fff;border:0;border-radius:9px;padding:10px;font-size:13px;font-weight:700;cursor:pointer}
+  .modal .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:3px;vertical-align:middle}
+</style>
+</head>
+<body>
+<header>
+  <h1>&#129446; モルダー刃物 使用量管理</h1>
+  <div class="hbtns">
+    <button class="gear" id="specBtn" title="仕様">&#8505;&#65039;</button>
+    <button class="gear" id="gear" title="編集">&#9881;&#65039;</button>
+  </div>
+</header>
+<div class="wrap">
+  <div class="status" id="status">読み込み中…</div>
+  <div class="admin" id="admin">
+    <h3>項目を追加</h3>
+    <select id="newType">
+      <option value="product">製品（個別に積む刃）</option>
+      <option value="common">上下刃（全加工で加算）</option>
+      <option value="date">日付（交換日・メンテ）</option>
+    </select>
+    <input id="newName" placeholder="名前（例: 9mmフローリング）">
+    <button class="add" id="addItemBtn">＋ 項目を追加</button>
+    <div class="foot" style="margin-top:6px">各カードの「✏」で累計訂正、「×」で削除できます</div>
+  </div>
+
+  <div class="label">① 加工を追加</div>
+  <div class="card addcard">
+    <div class="chips" id="prodChips"></div>
+    <div class="lenrow" id="lenRow"></div>
+    <div class="ihint">段数（枠をタップして入力）　または　時間を選択</div>
+    <div class="io">
+      <input class="sval" id="danInput" type="number" inputmode="numeric" value="0">
+      <div class="su">段</div>
+      <div class="orv">または</div>
+      <div class="selbox"><select id="selTime"></select></div>
+    </div>
+    <div class="preview" id="preview"></div>
+    <button class="addbtn" id="addBtn" disabled>＋ 追加する</button>
+  </div>
+
+  <div class="note">&#9888; 目安は<b style="color:#7a5418">目安</b>。オス・メスが<b>焦げず・荒れていなければ</b>超えても延長OK。<b>焦げ・刃物割れ</b>は早めに交換。</div>
+
+  <div class="label">② 上下刃</div>
+  <div id="commons"></div>
+  <div class="label">③ 製品ごとの累計</div>
+  <div id="products"></div>
+  <div class="label">④ 交換日・メンテ</div>
+  <div id="dates"></div>
+  <div class="foot">【加工時間の計算】1段=9枚（Nのみ8枚入）、1枚=長さ(m)×0.1375分（加工予定表の式準拠）。<br>1段あたり → 1m=1.0／2m=2.5／3m=3.5／4m=5.0分（0.5分単位に丸め）。詳しくは右上の &#8505;</div>
+</div>
+
+<div class="overlay" id="specModal">
+  <div class="modal">
+    <h2>&#128203; このツールの要件定義</h2>
+    <h3>目的</h3>
+    <p>モルダー加工で各刃物の使用量を「加工時間」で積み上げ、交換目安に対する使用率で交換時期を判断する。</p>
+    <h3>使い方</h3>
+    <ul>
+      <li>製品を選ぶ（<b>F</b>=15mmフローリング／<b>P</b>=羽目板／<b>F(12)</b>=12mmフローリング／<b>N</b>=ナイス新刃／<b>S</b>=スノコ）</li>
+      <li>長さを選ぶ（1m／2m／3m／4m）</li>
+      <li>段数を入力 または 加工時間を選択 →「追加する」で累計に加算</li>
+    </ul>
+    <h3>計算ルール</h3>
+    <ul>
+      <li>1段 ＝ 9枚（<b>Nのみ8枚入</b>）</li>
+      <li>1枚あたり時間 ＝ 長さ(m) × 0.1375分（加工予定表の式「4分×長/4000×入数/8×段×1.1」準拠）</li>
+      <li>加算時間は0.5分単位に丸め（ドリフト防止）</li>
+      <li>1段あたり（9枚）：1m=1.0／2m=2.5／3m=3.5／4m=5.0分</li>
+    </ul>
+    <h3>上下刃（全加工で加算）</h3>
+    <p>上下刃は全製品の加工で摩耗するため、どの製品を追加しても同じ量が自動で上下刃にも加算される。</p>
+    <h3>交換目安と色</h3>
+    <ul>
+      <li>15mmフローリング(F)＝80時間、それ以外の刃＝60時間</li>
+      <li>使用率で色が変化：<span class="sw" style="background:var(--ok)"></span>〜70%緑／<span class="sw" style="background:var(--soon)"></span>70-90%黄（そろそろ）／<span class="sw" style="background:var(--near)"></span>90-100%橙（もうすぐ）／<span class="sw" style="background:var(--over)"></span>100%超 赤（交換時期・点滅）</li>
+      <li>目安はあくまで目安。オス・メスが焦げず・荒れていなければ延長OK。焦げ・刃物割れは早めに交換。</li>
+    </ul>
+    <h3>交換・訂正</h3>
+    <p>各カードの「🔄交換」で累計を0に戻し交換日を記録。編集モード（⚙）の「✏」で累計時間を手動訂正できる。</p>
+    <h3>データ</h3>
+    <p>画面はGitHub Pages、データはGoogleスプレッドシート（GAS API経由）。複数端末で同じ最新状態を共有。</p>
+    <button class="close" id="specClose">閉じる</button>
+  </div>
+</div>
+
+<script>
+  var API='https://script.google.com/macros/s/AKfycbwmcImkSxLl63lzlWAbRcUgfIG9dajZHOoFBtqQn_0z5v3Lg_ydXSOauHHCMeCu3Qfxww/exec';
+  var _n=0;
+  function jsonp(params){
+    return new Promise(function(res,rej){
+      var cb='__cb'+(++_n);
+      var s=document.createElement('script');
+      var t=setTimeout(function(){cleanup();rej(new Error('timeout'));},20000);
+      function cleanup(){ try{delete window[cb];}catch(e){window[cb]=undefined;} if(s.parentNode)s.parentNode.removeChild(s); clearTimeout(t); }
+      window[cb]=function(data){ cleanup(); res(data); };
+      s.onerror=function(){ cleanup(); rej(new Error('network')); };
+      var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
+      s.src=API+'?'+qs+'&callback='+cb;
+      document.head.appendChild(s);
+    });
+  }
+  var ACT={getData:'get',addUsage:'add',resetItem:'reset',setDate:'setdate',addItem:'additem',deleteItem:'delitem',setVals:'setvals'};
+  function call(fn){
+    var a=[].slice.call(arguments,1); var p={action:ACT[fn]};
+    if(fn==='addUsage'){p.name=a[0];p.dan=a[1];p.min=a[2];p.mai=a[3];}
+    else if(fn==='resetItem'){p.name=a[0];}
+    else if(fn==='setDate'){p.name=a[0];p.date=a[1];}
+    else if(fn==='addItem'){p.type=a[0];p.name=a[1];}
+    else if(fn==='deleteItem'){p.name=a[0];}
+    else if(fn==='setVals'){p.name=a[0];p.dan=a[1];p.min=a[2];p.mai=a[3];}
+    return jsonp(p);
+  }
+
+  var LENS=[{label:'1m',mm:1000},{label:'2m',mm:2000},{label:'3m',mm:3000},{label:'4m',mm:4000}];
+  var CODE_ORDER=['15mmフローリング','羽目板','12mmフローリング','ナイス新刃','スノコ'];
+  var SHORT={'15mmフローリング':'F','羽目板':'P','12mmフローリング':'F(12)','ナイス新刃':'N','スノコ':'S'};
+  var DATA=[];
+  var selProduct=null, selLen=4000, lastIn='dan', danVal=0;
+  var $=function(id){ return document.getElementById(id); };
+  function shortLabel(name){ return SHORT[name]||name; }
+  function maiPerDan(name){ return name==='ナイス新刃' ? 8 : 9; }
+  function round05(x){ return Math.round(x*2)/2; }
+  function perBoardMin(mm){ return mm*0.0001375; }
+  function fmtTime(min){
+    if(!isFinite(min)||min<=0) return '0分';
+    var t=Math.round(min*10)/10, h=Math.floor(t/60), m=Math.round((t-h*60)*10)/10;
+    if(h>0&&m>0) return h+'時間'+(m%1===0?m:m.toFixed(1))+'分';
+    if(h>0) return h+'時間';
+    return (m%1===0?m:m.toFixed(1))+'分';
+  }
+  function fmtHours(min){ return trim(min/60)+'時間'; }
+  function trim(n){ return (Math.abs(n-Math.round(n))<0.05)?String(Math.round(n)):n.toFixed(1); }
+  function setStatus(s){ $('status').textContent=s; }
+  function guideHours(it){
+    if(it.type==='date') return 0;
+    if(it.name.indexOf('15mm')>=0&&it.name.indexOf('フローリング')>=0) return 80;
+    return 60;
+  }
+  function stageOf(r){
+    if(r>=1)   return {k:'over',col:'var(--over)',tag:'交換時期',tc:'ov',msg:'🔴 交換時期です'};
+    if(r>=0.9) return {k:'near',col:'var(--near)',tag:'もうすぐ',tc:'ne',msg:'🟠 もうすぐ交換'};
+    if(r>=0.7) return {k:'soon',col:'var(--soon)',tag:'そろそろ',tc:'so',msg:'🟡 そろそろ交換時期'};
+    return {k:'ok',col:'var(--ok)',tag:'',tc:'',msg:''};
+  }
+  function buildTimeOptions(){
+    var sel=$('selTime'); sel.innerHTML='<option value="0">時間</option>';
+    for(var m=10;m<=480;m+=10){ var o=document.createElement('option'); o.value=m; o.textContent=fmtTime(m); sel.appendChild(o); }
+  }
+  function calcTrio(){
+    var T=perBoardMin(selLen), mpd=maiPerDan(selProduct), dan=0, min=0, mai=0;
+    if(lastIn==='dan'){ dan=danVal; mai=dan*mpd; min=round05(mai*T); }
+    else { min=round05(parseFloat($('selTime').value)||0); mai=T>0?min/T:0; dan=mai/mpd; }
+    return {dan:dan,min:min,mai:mai};
+  }
+  function updatePreview(){
+    var t=calcTrio(), canAdd=selProduct&&(t.dan>0||t.min>0);
+    $('addBtn').disabled=!canAdd;
+    if(!selProduct){ $('preview').textContent='↑ まず製品を選んでください'; return; }
+    if(t.dan<=0&&t.min<=0){ $('preview').textContent='段数を入力するか時間を選択'; return; }
+    $('preview').innerHTML='→ <b>'+fmtTime(t.min)+'</b>（'+selLen/1000+'m・'+trim(t.dan)+'段・'+trim(t.mai)+'枚）を <b>'+shortLabel(selProduct)+'</b>＋上下刃 に加算';
+  }
+  function buildAddPanel(){
+    var prods=DATA.filter(function(d){return d.type==='product';});
+    prods.sort(function(a,b){var ia=CODE_ORDER.indexOf(a.name),ib=CODE_ORDER.indexOf(b.name);return (ia<0?99:ia)-(ib<0?99:ib);});
+    var pc=$('prodChips'); pc.innerHTML='';
+    prods.forEach(function(d){ var b=document.createElement('button');
+      b.className='chip'+(d.name===selProduct?' on':''); b.textContent=shortLabel(d.name); b.title=d.name;
+      b.onclick=function(){ selProduct=d.name; buildAddPanel(); updatePreview(); }; pc.appendChild(b); });
+    var lr=$('lenRow'); lr.innerHTML='';
+    LENS.forEach(function(L){ var b=document.createElement('button');
+      b.className='lenbtn'+(L.mm===selLen?' on':''); b.textContent=L.label;
+      b.onclick=function(){ selLen=L.mm; buildAddPanel(); updatePreview(); }; lr.appendChild(b); });
+  }
+  function accCard(d){
+    var gh=guideHours(d), hrs=d.min/60, ratio=gh>0?hrs/gh:0, st=stageOf(ratio);
+    var c=document.createElement('div');
+    c.className='card acc'+(d.type==='common'?' common':'')+(gh>0&&st.k!=='ok'?(' st-'+st.k):'');
+    var edt=document.createElement('button'); edt.className='editbtn'; edt.textContent='✏';
+    edt.onclick=function(){
+      var v=prompt('「'+d.name+'」の累計時間（時間）を入力', trim(d.min/60));
+      if(v===null) return; var h=parseFloat(v);
+      if(isNaN(h)||h<0){ alert('数字を入力してください'); return; }
+      setStatus('訂正中…');
+      call('setVals',d.name,d.dan,Math.round(h*60*100)/100,d.mai).then(refresh).then(function(){setStatus('訂正しました');});
+    };
+    c.appendChild(edt);
+    var del=document.createElement('button'); del.className='delcard'; del.textContent='×';
+    del.onclick=function(){ if(confirm('「'+d.name+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh); } };
+    c.appendChild(del);
+    var top=document.createElement('div'); top.className='top';
+    var nm=document.createElement('div'); nm.className='nm'; nm.textContent=d.name;
+    if(d.type==='common'){ var tg=document.createElement('span'); tg.className='tag cm'; tg.textContent='全加工'; nm.appendChild(tg); }
+    if(st.tag){ var tw=document.createElement('span'); tw.className='tag '+st.tc; tw.textContent=st.tag; nm.appendChild(tw); }
+    var nums=document.createElement('div'); nums.className='nums';
+    var ncol=(gh>0&&st.k!=='ok')?(' style="color:'+st.col+'"'):'';
+    nums.innerHTML='<span class="n nt"'+ncol+'>'+fmtHours(d.min)+'</span><span class="n nd">'+trim(d.dan)+'段</span>';
+    top.appendChild(nm); top.appendChild(nums); c.appendChild(top);
+    if(gh>0){
+      var pct=Math.min(100,ratio*100);
+      var bar=document.createElement('div'); bar.className='gbar';
+      bar.innerHTML='<div class="fill" style="width:'+pct+'%;background:'+st.col+'"></div>'; c.appendChild(bar);
+    }
+    var bot=document.createElement('div'); bot.className='bot';
+    var g=document.createElement('div'); g.className='guide'; if(gh>0) g.style.color=st.col;
+    if(gh>0){
+      var info=(ratio>=1)?('目安'+gh+'時間を <b>'+trim(hrs-gh)+'時間</b>超過'):('目安'+gh+'時間（あと <b>'+trim(gh-hrs)+'時間</b>）');
+      g.innerHTML=(st.msg?(st.msg+'　'):'')+info+(d.date?'　前回'+d.date:'');
+    }
+    var rb=document.createElement('button'); rb.className='resetbtn'+(ratio>=1?' hot':''); rb.textContent='🔄 交換';
+    rb.onclick=function(){ if(confirm('「'+d.name+'」を交換して累計を0に戻しますか?\n（今日を交換日に記録）')){ setStatus('交換中…'); call('resetItem',d.name).then(refresh).then(function(){setStatus('交換しました');}); } };
+    bot.appendChild(g); bot.appendChild(rb); c.appendChild(bot);
+    return c;
+  }
+  function dateCard(d){
+    var c=document.createElement('div'); c.className='card acc';
+    var del=document.createElement('button'); del.className='delcard'; del.textContent='×';
+    del.onclick=function(){ if(confirm('「'+d.name+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh); } };
+    c.appendChild(del);
+    var row=document.createElement('div'); row.className='dc';
+    row.innerHTML='<div class="nm2"></div><div class="v">'+(d.date||'—')+'</div>';
+    row.querySelector('.nm2').textContent=d.name; c.appendChild(row);
+    var bs=document.createElement('div'); bs.className='date-btns';
+    var today=document.createElement('button'); today.className='today'; today.textContent='今日に更新';
+    today.onclick=function(){ setStatus('更新中…'); call('setDate',d.name,todayStr()).then(refresh).then(function(){setStatus('更新しました');}); };
+    var pick=document.createElement('button'); pick.className='pick'; pick.textContent='📅 日付選択';
+    var inp=document.createElement('input'); inp.type='date'; inp.value=toISO(d.date);
+    inp.onchange=function(){ setStatus('更新中…'); call('setDate',d.name,fromISO(inp.value)).then(refresh).then(function(){setStatus('更新しました');}); };
+    pick.appendChild(inp); bs.appendChild(today); bs.appendChild(pick); c.appendChild(bs);
+    return c;
+  }
+  function todayStr(){ var d=new Date(); return d.getFullYear()+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+('0'+d.getDate()).slice(-2); }
+  function toISO(s){ return s?String(s).split('/').join('-'):''; }
+  function fromISO(s){ return s?String(s).split('-').join('/'):''; }
+  function render(){
+    if(!selProduct){ var p=DATA.filter(function(d){return d.type==='product';}); if(p.length){ p.sort(function(a,b){var ia=CODE_ORDER.indexOf(a.name),ib=CODE_ORDER.indexOf(b.name);return (ia<0?99:ia)-(ib<0?99:ib);}); selProduct=p[0].name; } }
+    buildAddPanel(); updatePreview();
+    var com=$('commons'); com.innerHTML=''; DATA.filter(function(d){return d.type==='common';}).forEach(function(d){ com.appendChild(accCard(d)); });
+    var pr=$('products'); pr.innerHTML='';
+    var prods=DATA.filter(function(d){return d.type==='product';});
+    prods.sort(function(a,b){var ia=CODE_ORDER.indexOf(a.name),ib=CODE_ORDER.indexOf(b.name);return (ia<0?99:ia)-(ib<0?99:ib);});
+    prods.forEach(function(d){ pr.appendChild(accCard(d)); });
+    var dt=$('dates'); dt.innerHTML=''; DATA.filter(function(d){return d.type==='date';}).forEach(function(d){ dt.appendChild(dateCard(d)); });
+  }
+  function refresh(data){ if(data) DATA=data; render(); return DATA; }
+  $('danInput').addEventListener('input',function(){ var v=parseInt(this.value,10); danVal=isNaN(v)?0:Math.max(0,v); lastIn='dan'; $('selTime').value='0'; updatePreview(); });
+  $('danInput').addEventListener('focus',function(){ this.select(); });
+  $('selTime').onchange=function(){ lastIn='time'; if(this.value!=='0'){ danVal=0; $('danInput').value='0'; } updatePreview(); };
+  $('addBtn').onclick=function(){
+    var t=calcTrio(); if(!selProduct||(t.dan<=0&&t.min<=0)) return;
+    $('addBtn').disabled=true; setStatus('追加中…');
+    call('addUsage',selProduct,t.dan,t.min,t.mai).then(function(data){
+      DATA=data; danVal=0; $('danInput').value='0'; $('selTime').value='0'; lastIn='dan';
+      render(); setStatus('✅ '+shortLabel(selProduct)+' に追加');
+    }).catch(function(){ setStatus('⚠ 追加失敗。再読込を'); $('addBtn').disabled=false; });
+  };
+  $('gear').onclick=function(){ var on=document.body.classList.toggle('editmode'); $('admin').classList.toggle('show',on); setStatus(on?'編集モード（✏で訂正・×で削除）':''); };
+  $('specBtn').onclick=function(){ $('specModal').classList.add('show'); };
+  $('specClose').onclick=function(){ $('specModal').classList.remove('show'); };
+  $('specModal').onclick=function(e){ if(e.target===this) this.classList.remove('show'); };
+  $('addItemBtn').onclick=function(){
+    var tp=$('newType').value, nm=$('newName').value;
+    if(!nm.trim()){ alert('名前を入力してください'); return; }
+    setStatus('追加中…');
+    call('addItem',tp,nm).then(refresh).then(function(){ $('newName').value=''; setStatus('追加しました'); });
+  };
+  buildTimeOptions();
+  setStatus('読み込み中…');
+  call('getData').then(function(data){ DATA=data; render(); setStatus(''); }).catch(function(){ setStatus('⚠ 読み込み失敗。再読込してください'); });
+  window.addEventListener('focus',function(){ call('getData').then(function(data){ DATA=data; render(); }).catch(function(){}); });
+</script>
+</body>
+</html>
