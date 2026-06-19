@@ -15,78 +15,82 @@
   html,body{margin:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
   header{position:sticky;top:0;z-index:10;background:var(--accent);color:#fff;
-    padding:7px 12px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between}
-  header h1{font-size:14px;margin:0;font-weight:700}
+    padding:5px 11px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between}
+  header h1{font-size:13px;margin:0;font-weight:700}
   header .hbtns{display:flex;gap:5px}
-  header .gear{background:rgba(255,255,255,.18);border:0;color:#fff;font-size:14px;width:30px;height:30px;border-radius:8px;cursor:pointer}
-  .wrap{max-width:560px;margin:0 auto;padding:7px 9px 36px}
-  .status{font-size:11px;color:var(--sub);text-align:center;margin:2px 0 5px;min-height:13px}
-  .label{font-size:11px;color:var(--sub);font-weight:700;margin:9px 3px 4px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px;margin-bottom:7px;box-shadow:var(--shadow)}
+  header .gear{background:rgba(255,255,255,.18);border:0;color:#fff;font-size:13px;width:28px;height:28px;border-radius:7px;cursor:pointer}
+  .wrap{max-width:560px;margin:0 auto;padding:6px 8px 30px}
+  .status{font-size:10.5px;color:var(--sub);text-align:center;margin:1px 0 4px;min-height:12px}
+  .label{font-size:10.5px;color:var(--sub);font-weight:700;margin:7px 3px 3px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 8px;margin-bottom:5px;box-shadow:var(--shadow)}
   .addcard{border:2px solid var(--accent);background:#fffaf3}
   .chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px}
-  .chip{border:2px solid var(--line);background:#fff;border-radius:9px;padding:8px 0;width:50px;text-align:center;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer}
+  .chip{border:2px solid var(--line);background:#fff;border-radius:8px;padding:7px 0;width:47px;text-align:center;font-size:15px;font-weight:800;color:var(--ink);cursor:pointer}
   .chip.on{border-color:var(--accent);background:#ffe9d3;color:var(--accent-d)}
-  .lenrow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px}
-  .lenbtn{border:2px solid var(--line);background:#fff;border-radius:9px;padding:8px 0;font-size:14px;font-weight:800;cursor:pointer}
+  .lenrow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:6px}
+  .lenbtn{border:2px solid var(--line);background:#fff;border-radius:8px;padding:7px 0;font-size:14px;font-weight:800;cursor:pointer}
   .lenbtn.on{border-color:var(--accent);background:#ffe9d3;color:var(--accent-d)}
-  .ihint{font-size:10.5px;color:var(--sub);font-weight:700;margin-bottom:4px}
-  .io{display:flex;align-items:center;gap:7px}
-  .sval{flex:1;width:100%;text-align:center;font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;border:2px solid var(--line);border-radius:10px;padding:8px 0;background:#fff;color:var(--ink)}
+  .io{display:flex;align-items:center;gap:6px}
+  .sval{flex:1;width:100%;text-align:center;font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;border:2px solid var(--line);border-radius:9px;padding:7px 0;background:#fff;color:var(--ink)}
   .sval:focus{outline:none;border-color:var(--accent);background:#fffaf3}
   .io .su{font-size:12px;color:var(--sub);font-weight:700}
-  .io .orv{font-size:10.5px;color:var(--sub);font-weight:700}
+  .io .orv{font-size:10px;color:var(--sub);font-weight:700}
   .selbox{position:relative;flex:1.1}
-  .selbox select{width:100%;padding:11px;border:2px solid var(--line);border-radius:10px;font-size:16px;font-weight:800;background:#fff;color:var(--ink);appearance:none;-webkit-appearance:none}
-  .selbox::after{content:"\25BC";position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:10px;pointer-events:none}
-  .preview{font-size:11px;color:var(--accent-d);margin:7px 2px 0;min-height:14px;line-height:1.4}
-  .addbtn{width:100%;margin-top:7px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px;font-size:16px;font-weight:800;cursor:pointer}
+  .selbox select{width:100%;padding:10px;border:2px solid var(--line);border-radius:9px;font-size:15px;font-weight:800;background:#fff;color:var(--ink);appearance:none;-webkit-appearance:none}
+  .selbox::after{content:"\25BC";position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:9px;pointer-events:none}
+  .preview{font-size:10.5px;color:var(--accent-d);margin:6px 2px 0;min-height:13px;line-height:1.35}
+  .addbtn{width:100%;margin-top:6px;background:var(--accent);color:#fff;border:0;border-radius:9px;padding:11px;font-size:16px;font-weight:800;cursor:pointer}
   .addbtn:active{filter:brightness(.92)}
   .addbtn:disabled{background:#cbb8a3}
-  .note{background:#fff4e6;border:1px solid #f0c98a;border-radius:9px;padding:7px 10px;font-size:11px;line-height:1.45;color:#7a5418;margin-bottom:7px}
+  .undobtn{display:none;width:100%;margin-top:5px;background:#fff;color:var(--accent-d);border:1.5px solid var(--accent);border-radius:9px;padding:8px;font-size:13px;font-weight:700;cursor:pointer}
+  .undobtn.show{display:block}
+  .note{background:#fff4e6;border:1px solid #f0c98a;border-radius:8px;padding:6px 9px;font-size:10.5px;line-height:1.4;color:#7a5418;margin-bottom:5px}
   .note b{color:var(--warn)}
   .acc{position:relative}
   .acc.common{border:1.5px solid var(--common);background:#faf5fd}
   .acc.st-soon{border:1.5px solid var(--soon);background:#fffdf2}
   .acc.st-near{border:1.5px solid var(--near);background:#fff7ef}
   .acc.st-over{border:2px solid var(--over);background:#fff2f2;animation:pulse 1.4s ease-in-out infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,0)}50%{box-shadow:0 0 0 4px rgba(198,40,40,.16)}}
-  .top{display:flex;align-items:baseline;justify-content:space-between;gap:7px}
-  .nm{font-size:13px;font-weight:800}
-  .nm .tag{font-size:9px;color:#fff;border-radius:5px;padding:1px 5px;margin-left:4px;vertical-align:middle}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,0)}50%{box-shadow:0 0 0 3px rgba(198,40,40,.16)}}
+  .top{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+  .nm{font-size:12.5px;font-weight:800;line-height:1.1}
+  .nm .tag{font-size:8.5px;color:#fff;border-radius:4px;padding:1px 4px;margin-left:4px;vertical-align:middle}
   .tag.cm{background:var(--common)}
   .tag.so{background:var(--soon)}
   .tag.ne{background:var(--near)}
   .tag.ov{background:var(--over)}
-  .nums{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
-  .nums .n{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .nums{display:flex;align-items:baseline;gap:9px;white-space:nowrap}
+  .nums .n{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
   .nums .nt{color:var(--accent-d)}
   .nums .nd{color:var(--dan)}
-  .gbar{height:7px;background:#eee3d2;border-radius:5px;overflow:hidden;margin:7px 0 5px}
-  .gbar .fill{height:100%;border-radius:5px;transition:width .2s}
-  .bot{display:flex;align-items:center;justify-content:space-between;gap:7px}
-  .guide{font-size:11px;font-weight:700;line-height:1.25;color:var(--sub)}
-  .guide b{font-size:12.5px}
-  .resetbtn{flex:none;background:#fff;color:var(--reset);border:1.5px solid var(--reset);border-radius:8px;padding:6px 11px;font-size:11.5px;font-weight:800;cursor:pointer}
-  .resetbtn.hot{background:var(--over);color:#fff}
-  .delcard{position:absolute;top:7px;right:7px;background:var(--reset);color:#fff;border:0;border-radius:6px;width:25px;height:25px;font-size:13px;cursor:pointer;display:none;z-index:2}
-  .editbtn{position:absolute;top:7px;right:37px;background:#fff;color:var(--accent);border:1.5px solid var(--accent);border-radius:6px;width:25px;height:25px;font-size:12px;cursor:pointer;display:none;z-index:2}
-  .editmode .delcard,.editmode .editbtn{display:block}
-  .dc{display:flex;align-items:center;justify-content:space-between;gap:7px}
-  .dc .nm2{font-size:13px;font-weight:700}
-  .dc .v{font-size:17px;font-weight:800;color:var(--date);font-variant-numeric:tabular-nums}
-  .date-btns{display:flex;gap:5px;margin-top:6px}
-  .date-btns button{flex:1;border-radius:8px;padding:7px;font-size:12px;font-weight:700;cursor:pointer}
+  .nums .u{font-size:9.5px;color:var(--sub);font-weight:700;margin-left:-6px}
+  .gbar{height:6px;background:#eee3d2;border-radius:4px;overflow:hidden;margin:5px 0 4px}
+  .gbar .fill{height:100%;border-radius:4px;transition:width .2s}
+  .bot{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .guide{font-size:10.5px;font-weight:700;line-height:1.2;color:var(--sub);flex:1;min-width:0}
+  .guide b{font-size:12px}
+  .btns{display:flex;gap:5px;flex:none}
+  .minib{border-radius:7px;padding:5px 9px;font-size:11px;font-weight:800;cursor:pointer;border:1.5px solid;background:#fff}
+  .fixb{color:var(--accent-d);border-color:var(--accent)}
+  .resb{color:var(--reset);border-color:var(--reset)}
+  .resb.hot{background:var(--over);color:#fff}
+  .delcard{position:absolute;top:6px;right:6px;background:var(--reset);color:#fff;border:0;border-radius:6px;width:23px;height:23px;font-size:12px;cursor:pointer;display:none;z-index:2}
+  .editmode .delcard{display:block}
+  .dc{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .dc .nm2{font-size:12.5px;font-weight:700}
+  .dc .v{font-size:16px;font-weight:800;color:var(--date);font-variant-numeric:tabular-nums}
+  .date-btns{display:flex;gap:5px;margin-top:5px}
+  .date-btns button{flex:1;border-radius:7px;padding:6px;font-size:11.5px;font-weight:700;cursor:pointer}
   .today{background:var(--date);color:#fff;border:0}
   .pick{background:#fff;color:var(--date);border:1.5px solid var(--date);position:relative;overflow:hidden}
   .pick input{position:absolute;inset:0;opacity:0;cursor:pointer}
-  .admin{display:none;background:#fff7ec;border:1px dashed var(--accent);border-radius:10px;padding:10px;margin-bottom:9px}
+  .admin{display:none;background:#fff7ec;border:1px dashed var(--accent);border-radius:9px;padding:9px;margin-bottom:7px}
   .admin.show{display:block}
-  .admin h3{margin:0 0 6px;font-size:12px;color:var(--accent-d)}
-  .admin select,.admin input{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin-bottom:6px;background:#fff}
-  .admin .add{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px;font-size:13px;font-weight:700;width:100%;cursor:pointer}
-  .foot{font-size:10px;color:var(--sub);text-align:center;margin-top:10px;line-height:1.45}
-  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;align-items:center;justify-content:center;padding:13px}
+  .admin h3{margin:0 0 5px;font-size:12px;color:var(--accent-d)}
+  .admin select,.admin input{width:100%;padding:8px;border:1px solid var(--line);border-radius:7px;font-size:13px;margin-bottom:5px;background:#fff}
+  .admin .add{background:var(--accent);color:#fff;border:0;border-radius:7px;padding:8px;font-size:13px;font-weight:700;width:100%;cursor:pointer}
+  .foot{font-size:9.5px;color:var(--sub);text-align:center;margin-top:9px;line-height:1.4}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;align-items:center;justify-content:center;padding:12px}
   .overlay.show{display:flex}
   .modal{background:#fff;border-radius:13px;max-width:520px;width:100%;max-height:86vh;overflow:auto;padding:15px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
   .modal h2{font-size:15px;margin:0 0 4px;color:var(--accent-d)}
@@ -117,14 +121,13 @@
     </select>
     <input id="newName" placeholder="名前（例: 9mmフローリング）">
     <button class="add" id="addItemBtn">＋ 項目を追加</button>
-    <div class="foot" style="margin-top:6px">各カードの「✏」で累計訂正、「×」で削除できます</div>
+    <div class="foot" style="margin-top:5px">「修正」で累計を変更、編集モードの「×」で削除</div>
   </div>
 
   <div class="label">① 加工を追加</div>
   <div class="card addcard">
     <div class="chips" id="prodChips"></div>
     <div class="lenrow" id="lenRow"></div>
-    <div class="ihint">段数（枠をタップして入力）　または　時間を選択</div>
     <div class="io">
       <input class="sval" id="danInput" type="number" inputmode="numeric" value="0">
       <div class="su">段</div>
@@ -133,9 +136,10 @@
     </div>
     <div class="preview" id="preview"></div>
     <button class="addbtn" id="addBtn" disabled>＋ 追加する</button>
+    <button class="undobtn" id="undoBtn">&#8617; 直前の追加を取り消す</button>
   </div>
 
-  <div class="note">&#9888; 目安は<b style="color:#7a5418">目安</b>。オス・メスが<b>焦げず・荒れていなければ</b>超えても延長OK。<b>焦げ・刃物割れ</b>は早めに交換。</div>
+  <div class="note">&#9888; 目安は<b style="color:#7a5418">目安</b>。オス・メスが<b>焦げず・荒れてなければ</b>超えても延長OK。<b>焦げ・割れ</b>は早めに交換。</div>
 
   <div class="label">② 上下刃</div>
   <div id="commons"></div>
@@ -143,7 +147,7 @@
   <div id="products"></div>
   <div class="label">④ 交換日・メンテ</div>
   <div id="dates"></div>
-  <div class="foot">【加工時間の計算】1段=9枚（Nのみ8枚入）、1枚=長さ(m)×0.1375分（加工予定表の式準拠）。<br>1段あたり → 1m=1.0／2m=2.5／3m=3.5／4m=5.0分（0.5分単位に丸め）。詳しくは右上の &#8505;</div>
+  <div class="foot">時間＝加工時間の累計／段＝4m換算の段数。1段=9枚(Nは8枚)、1枚=長さ(m)×0.1375分。詳しくは右上 &#8505;</div>
 </div>
 
 <div class="overlay" id="specModal">
@@ -153,15 +157,20 @@
     <p>モルダー加工で各刃物の使用量を「加工時間」で積み上げ、交換目安に対する使用率で交換時期を判断する。</p>
     <h3>使い方</h3>
     <ul>
-      <li>製品を選ぶ（<b>F</b>=15mmフローリング／<b>P</b>=羽目板／<b>F(12)</b>=12mmフローリング／<b>N</b>=ナイス新刃／<b>S</b>=スノコ）</li>
+      <li>製品を選ぶ（<b>F</b>=15mmフローリング／<b>P</b>=羽目板／<b>F(12)</b>=12mmフローリング／<b>N</b>=ナイスオリジナル／<b>S</b>=スノコ）</li>
       <li>長さを選ぶ（1m／2m／3m／4m）</li>
       <li>段数を入力 または 加工時間を選択 →「追加する」で累計に加算</li>
+      <li>追加を間違えたら「直前の追加を取り消す」で1つ戻せる</li>
+    </ul>
+    <h3>表示の見方</h3>
+    <ul>
+      <li>大きい数字 左＝<b>累計の加工時間</b>、右＝それを<b>4m換算した段数</b></li>
     </ul>
     <h3>計算ルール</h3>
     <ul>
       <li>1段 ＝ 9枚（<b>Nのみ8枚入</b>）</li>
       <li>1枚あたり時間 ＝ 長さ(m) × 0.1375分（加工予定表の式「4分×長/4000×入数/8×段×1.1」準拠）</li>
-      <li>加算時間は0.5分単位に丸め（ドリフト防止）</li>
+      <li>加算時間は0.5分単位に丸め</li>
       <li>1段あたり（9枚）：1m=1.0／2m=2.5／3m=3.5／4m=5.0分</li>
     </ul>
     <h3>上下刃（全加工で加算）</h3>
@@ -169,11 +178,11 @@
     <h3>交換目安と色</h3>
     <ul>
       <li>15mmフローリング(F)＝80時間、それ以外の刃＝60時間</li>
-      <li>使用率で色が変化：<span class="sw" style="background:var(--ok)"></span>〜70%緑／<span class="sw" style="background:var(--soon)"></span>70-90%黄（そろそろ）／<span class="sw" style="background:var(--near)"></span>90-100%橙（もうすぐ）／<span class="sw" style="background:var(--over)"></span>100%超 赤（交換時期・点滅）</li>
+      <li>使用率で色が変化：<span class="sw" style="background:var(--ok)"></span>〜70%緑／<span class="sw" style="background:var(--soon)"></span>70-90%黄／<span class="sw" style="background:var(--near)"></span>90-100%橙／<span class="sw" style="background:var(--over)"></span>100%超 赤（点滅）</li>
       <li>目安はあくまで目安。オス・メスが焦げず・荒れていなければ延長OK。焦げ・刃物割れは早めに交換。</li>
     </ul>
-    <h3>交換・訂正</h3>
-    <p>各カードの「🔄交換」で累計を0に戻し交換日を記録。編集モード（⚙）の「✏」で累計時間を手動訂正できる。</p>
+    <h3>修正・交換</h3>
+    <p>各カードの「修正」で累計時間を手動で直せる。「🔄交換」で累計を0に戻し交換日を記録。</p>
     <h3>データ</h3>
     <p>画面はGitHub Pages、データはGoogleスプレッドシート（GAS API経由）。複数端末で同じ最新状態を共有。</p>
     <button class="close" id="specClose">閉じる</button>
@@ -211,13 +220,17 @@
   var LENS=[{label:'1m',mm:1000},{label:'2m',mm:2000},{label:'3m',mm:3000},{label:'4m',mm:4000}];
   var CODE_ORDER=['15mmフローリング','羽目板','12mmフローリング','ナイス新刃','スノコ'];
   var SHORT={'15mmフローリング':'F','羽目板':'P','12mmフローリング':'F(12)','ナイス新刃':'N','スノコ':'S'};
+  var DISP={'ナイス新刃':'ナイスオリジナル'};
   var DATA=[];
-  var selProduct=null, selLen=4000, lastIn='dan', danVal=0;
+  var selProduct=null, selLen=4000, lastIn='dan', danVal=0, lastAdd=null;
   var $=function(id){ return document.getElementById(id); };
   function shortLabel(name){ return SHORT[name]||name; }
+  function dispName(name){ return DISP[name]||name; }
   function maiPerDan(name){ return name==='ナイス新刃' ? 8 : 9; }
   function round05(x){ return Math.round(x*2)/2; }
   function perBoardMin(mm){ return mm*0.0001375; }
+  function danPer4m(name){ return round05(perBoardMin(4000)*maiPerDan(name)); }
+  function dan4m(d){ var p=danPer4m(d.name); return p>0? d.min/p : 0; }
   function fmtTime(min){
     if(!isFinite(min)||min<=0) return '0分';
     var t=Math.round(min*10)/10, h=Math.floor(t/60), m=Math.round((t-h*60)*10)/10;
@@ -234,9 +247,9 @@
     return 60;
   }
   function stageOf(r){
-    if(r>=1)   return {k:'over',col:'var(--over)',tag:'交換時期',tc:'ov',msg:'🔴 交換時期です'};
+    if(r>=1)   return {k:'over',col:'var(--over)',tag:'交換時期',tc:'ov',msg:'🔴 交換時期'};
     if(r>=0.9) return {k:'near',col:'var(--near)',tag:'もうすぐ',tc:'ne',msg:'🟠 もうすぐ交換'};
-    if(r>=0.7) return {k:'soon',col:'var(--soon)',tag:'そろそろ',tc:'so',msg:'🟡 そろそろ交換時期'};
+    if(r>=0.7) return {k:'soon',col:'var(--soon)',tag:'そろそろ',tc:'so',msg:'🟡 そろそろ交換'};
     return {k:'ok',col:'var(--ok)',tag:'',tc:'',msg:''};
   }
   function buildTimeOptions(){
@@ -261,7 +274,7 @@
     prods.sort(function(a,b){var ia=CODE_ORDER.indexOf(a.name),ib=CODE_ORDER.indexOf(b.name);return (ia<0?99:ia)-(ib<0?99:ib);});
     var pc=$('prodChips'); pc.innerHTML='';
     prods.forEach(function(d){ var b=document.createElement('button');
-      b.className='chip'+(d.name===selProduct?' on':''); b.textContent=shortLabel(d.name); b.title=d.name;
+      b.className='chip'+(d.name===selProduct?' on':''); b.textContent=shortLabel(d.name); b.title=dispName(d.name);
       b.onclick=function(){ selProduct=d.name; buildAddPanel(); updatePreview(); }; pc.appendChild(b); });
     var lr=$('lenRow'); lr.innerHTML='';
     LENS.forEach(function(L){ var b=document.createElement('button');
@@ -272,25 +285,16 @@
     var gh=guideHours(d), hrs=d.min/60, ratio=gh>0?hrs/gh:0, st=stageOf(ratio);
     var c=document.createElement('div');
     c.className='card acc'+(d.type==='common'?' common':'')+(gh>0&&st.k!=='ok'?(' st-'+st.k):'');
-    var edt=document.createElement('button'); edt.className='editbtn'; edt.textContent='✏';
-    edt.onclick=function(){
-      var v=prompt('「'+d.name+'」の累計時間（時間）を入力', trim(d.min/60));
-      if(v===null) return; var h=parseFloat(v);
-      if(isNaN(h)||h<0){ alert('数字を入力してください'); return; }
-      setStatus('訂正中…');
-      call('setVals',d.name,d.dan,Math.round(h*60*100)/100,d.mai).then(refresh).then(function(){setStatus('訂正しました');});
-    };
-    c.appendChild(edt);
     var del=document.createElement('button'); del.className='delcard'; del.textContent='×';
-    del.onclick=function(){ if(confirm('「'+d.name+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh); } };
+    del.onclick=function(){ if(confirm('「'+dispName(d.name)+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh); } };
     c.appendChild(del);
     var top=document.createElement('div'); top.className='top';
-    var nm=document.createElement('div'); nm.className='nm'; nm.textContent=d.name;
+    var nm=document.createElement('div'); nm.className='nm'; nm.textContent=dispName(d.name);
     if(d.type==='common'){ var tg=document.createElement('span'); tg.className='tag cm'; tg.textContent='全加工'; nm.appendChild(tg); }
     if(st.tag){ var tw=document.createElement('span'); tw.className='tag '+st.tc; tw.textContent=st.tag; nm.appendChild(tw); }
     var nums=document.createElement('div'); nums.className='nums';
     var ncol=(gh>0&&st.k!=='ok')?(' style="color:'+st.col+'"'):'';
-    nums.innerHTML='<span class="n nt"'+ncol+'>'+fmtHours(d.min)+'</span><span class="n nd">'+trim(d.dan)+'段</span>';
+    nums.innerHTML='<span class="n nt"'+ncol+'>'+fmtHours(d.min)+'</span><span class="n nd">'+trim(dan4m(d))+'</span><span class="u">段(4m)</span>';
     top.appendChild(nm); top.appendChild(nums); c.appendChild(top);
     if(gh>0){
       var pct=Math.min(100,ratio*100);
@@ -300,12 +304,22 @@
     var bot=document.createElement('div'); bot.className='bot';
     var g=document.createElement('div'); g.className='guide'; if(gh>0) g.style.color=st.col;
     if(gh>0){
-      var info=(ratio>=1)?('目安'+gh+'時間を <b>'+trim(hrs-gh)+'時間</b>超過'):('目安'+gh+'時間（あと <b>'+trim(gh-hrs)+'時間</b>）');
-      g.innerHTML=(st.msg?(st.msg+'　'):'')+info+(d.date?'　前回'+d.date:'');
+      var info=(ratio>=1)?('目安'+gh+'h を <b>'+trim(hrs-gh)+'h</b>超過'):('目安'+gh+'h（あと <b>'+trim(gh-hrs)+'h</b>）');
+      g.innerHTML=(st.msg?(st.msg+' '):'')+info+(d.date?' 前'+d.date.slice(5):'');
     }
-    var rb=document.createElement('button'); rb.className='resetbtn'+(ratio>=1?' hot':''); rb.textContent='🔄 交換';
-    rb.onclick=function(){ if(confirm('「'+d.name+'」を交換して累計を0に戻しますか?\n（今日を交換日に記録）')){ setStatus('交換中…'); call('resetItem',d.name).then(refresh).then(function(){setStatus('交換しました');}); } };
-    bot.appendChild(g); bot.appendChild(rb); c.appendChild(bot);
+    var btns=document.createElement('div'); btns.className='btns';
+    var fb=document.createElement('button'); fb.className='minib fixb'; fb.textContent='修正';
+    fb.onclick=function(){
+      var v=prompt('「'+dispName(d.name)+'」の累計時間（時間）を入力',trim(d.min/60));
+      if(v===null) return; var h=parseFloat(v);
+      if(isNaN(h)||h<0){ alert('数字を入力してください'); return; }
+      setStatus('修正中…'); lastAdd=null; $('undoBtn').classList.remove('show');
+      call('setVals',d.name,0,Math.round(h*60*100)/100,0).then(refresh).then(function(){setStatus('修正しました');});
+    };
+    var rb=document.createElement('button'); rb.className='minib resb'+(ratio>=1?' hot':''); rb.textContent='🔄交換';
+    rb.onclick=function(){ if(confirm('「'+dispName(d.name)+'」を交換して累計を0に戻しますか?（今日を交換日に記録）')){ setStatus('交換中…'); lastAdd=null; $('undoBtn').classList.remove('show'); call('resetItem',d.name).then(refresh).then(function(){setStatus('交換しました');}); } };
+    btns.appendChild(fb); btns.appendChild(rb);
+    bot.appendChild(g); bot.appendChild(btns); c.appendChild(bot);
     return c;
   }
   function dateCard(d){
@@ -344,13 +358,24 @@
   $('selTime').onchange=function(){ lastIn='time'; if(this.value!=='0'){ danVal=0; $('danInput').value='0'; } updatePreview(); };
   $('addBtn').onclick=function(){
     var t=calcTrio(); if(!selProduct||(t.dan<=0&&t.min<=0)) return;
+    var affected={}; affected[selProduct]=1; DATA.forEach(function(d){ if(d.type==='common') affected[d.name]=1; });
+    var snap=DATA.filter(function(d){return affected[d.name];}).map(function(d){return {name:d.name,dan:d.dan,min:d.min,mai:d.mai};});
     $('addBtn').disabled=true; setStatus('追加中…');
     call('addUsage',selProduct,t.dan,t.min,t.mai).then(function(data){
-      DATA=data; danVal=0; $('danInput').value='0'; $('selTime').value='0'; lastIn='dan';
-      render(); setStatus('✅ '+shortLabel(selProduct)+' に追加');
+      DATA=data; lastAdd=snap; $('undoBtn').classList.add('show');
+      danVal=0; $('danInput').value='0'; $('selTime').value='0'; lastIn='dan';
+      render(); setStatus('✅ '+shortLabel(selProduct)+' に追加（取消可）');
     }).catch(function(){ setStatus('⚠ 追加失敗。再読込を'); $('addBtn').disabled=false; });
   };
-  $('gear').onclick=function(){ var on=document.body.classList.toggle('editmode'); $('admin').classList.toggle('show',on); setStatus(on?'編集モード（✏で訂正・×で削除）':''); };
+  $('undoBtn').onclick=function(){
+    if(!lastAdd) return;
+    setStatus('取消中…'); var snap=lastAdd; lastAdd=null; $('undoBtn').classList.remove('show');
+    Promise.all(snap.map(function(s){ return call('setVals',s.name,s.dan,s.min,s.mai); })).then(function(){
+      return call('getData');
+    }).then(function(data){ DATA=data; render(); setStatus('取り消しました'); })
+    .catch(function(){ setStatus('⚠ 取消失敗。再読込を'); });
+  };
+  $('gear').onclick=function(){ var on=document.body.classList.toggle('editmode'); $('admin').classList.toggle('show',on); setStatus(on?'編集モード（×で削除）':''); };
   $('specBtn').onclick=function(){ $('specModal').classList.add('show'); };
   $('specClose').onclick=function(){ $('specModal').classList.remove('show'); };
   $('specModal').onclick=function(e){ if(e.target===this) this.classList.remove('show'); };
