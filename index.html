@@ -336,7 +336,7 @@
     if(st.tag){ var tw=document.createElement('span'); tw.className='tag '+st.tc; tw.textContent=st.tag; nm.appendChild(tw); }
     var nums=document.createElement('div'); nums.className='nums';
     var ncol=(gh>0&&st.k!=='ok')?(' style="color:'+st.col+'"'):'';
-    nums.innerHTML='<span class="nt"'+ncol+'>'+fmtHours(d.min)+'</span><span class="nd">'+trim(dan4m(d))+'</span><span class="u">段(4m)</span>';
+    nums.innerHTML='<span class="nt"'+ncol+'>'+fmtHours(d.min)+'</span>';
     top.appendChild(nm); top.appendChild(nums); c.appendChild(top);
     if(gh>0){
       var pct=Math.min(100,ratio*100);
