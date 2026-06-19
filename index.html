@@ -59,11 +59,10 @@
   .tag.so{background:var(--soon)}
   .tag.ne{background:var(--near)}
   .tag.ov{background:var(--over)}
-  .nums{display:flex;align-items:baseline;gap:9px;white-space:nowrap}
-  .nums .n{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
-  .nums .nt{color:var(--accent-d)}
-  .nums .nd{color:var(--dan)}
-  .nums .u{font-size:9.5px;color:var(--sub);font-weight:700;margin-left:-6px}
+  .nums{display:flex;align-items:baseline;gap:7px;white-space:nowrap}
+  .nums .nt{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:var(--accent-d)}
+  .nums .nd{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--sub)}
+  .nums .u{font-size:8.5px;color:var(--sub);font-weight:700;margin-left:-5px}
   .gbar{height:6px;background:#eee3d2;border-radius:4px;overflow:hidden;margin:5px 0 4px}
   .gbar .fill{height:100%;border-radius:4px;transition:width .2s}
   .bot{display:flex;align-items:center;justify-content:space-between;gap:6px}
@@ -129,10 +128,10 @@
     <div class="chips" id="prodChips"></div>
     <div class="lenrow" id="lenRow"></div>
     <div class="io">
+      <div class="selbox"><select id="selTime"></select></div>
+      <div class="orv">または</div>
       <input class="sval" id="danInput" type="number" inputmode="numeric" value="0">
       <div class="su">段</div>
-      <div class="orv">または</div>
-      <div class="selbox"><select id="selTime"></select></div>
     </div>
     <div class="preview" id="preview"></div>
     <button class="addbtn" id="addBtn" disabled>＋ 追加する</button>
@@ -159,12 +158,12 @@
     <ul>
       <li>製品を選ぶ（<b>F</b>=15mmフローリング／<b>P</b>=羽目板／<b>F(12)</b>=12mmフローリング／<b>N</b>=ナイスオリジナル／<b>S</b>=スノコ）</li>
       <li>長さを選ぶ（1m／2m／3m／4m）</li>
-      <li>段数を入力 または 加工時間を選択 →「追加する」で累計に加算</li>
+      <li>時間を選択 または 段数を入力 →「追加する」で累計に加算</li>
       <li>追加を間違えたら「直前の追加を取り消す」で1つ戻せる</li>
     </ul>
     <h3>表示の見方</h3>
     <ul>
-      <li>大きい数字 左＝<b>累計の加工時間</b>、右＝それを<b>4m換算した段数</b></li>
+      <li>大きい数字＝<b>累計の加工時間</b>、右の小さい数字＝それを<b>4m換算した段数</b></li>
     </ul>
     <h3>計算ルール</h3>
     <ul>
@@ -174,17 +173,17 @@
       <li>1段あたり（9枚）：1m=1.0／2m=2.5／3m=3.5／4m=5.0分</li>
     </ul>
     <h3>上下刃（全加工で加算）</h3>
-    <p>上下刃は全製品の加工で摩耗するため、どの製品を追加しても同じ量が自動で上下刃にも加算される。</p>
+    <p>上下刃は全製品の加工で摩耗するため、どの製品を追加しても同じ量が自動で上下刃にも加算される。交換目安は5時間。</p>
     <h3>交換目安と色</h3>
     <ul>
-      <li>15mmフローリング(F)＝80時間、それ以外の刃＝60時間</li>
+      <li><b>上下刃＝5時間</b>／15mmフローリング(F)＝80時間／それ以外の刃＝60時間</li>
       <li>使用率で色が変化：<span class="sw" style="background:var(--ok)"></span>〜70%緑／<span class="sw" style="background:var(--soon)"></span>70-90%黄／<span class="sw" style="background:var(--near)"></span>90-100%橙／<span class="sw" style="background:var(--over)"></span>100%超 赤（点滅）</li>
       <li>目安はあくまで目安。オス・メスが焦げず・荒れていなければ延長OK。焦げ・刃物割れは早めに交換。</li>
     </ul>
     <h3>修正・交換</h3>
     <p>各カードの「修正」で累計時間を手動で直せる。「🔄交換」で累計を0に戻し交換日を記録。</p>
-    <h3>データ</h3>
-    <p>画面はGitHub Pages、データはGoogleスプレッドシート（GAS API経由）。複数端末で同じ最新状態を共有。</p>
+    <h3>データ・速度</h3>
+    <p>画面はGitHub Pages、データはGoogleスプレッドシート（GAS API経由）。前回データを端末にキャッシュして即表示、追加等は即反映（裏で保存）。</p>
     <button class="close" id="specClose">閉じる</button>
   </div>
 </div>
@@ -228,6 +227,7 @@
   function dispName(name){ return DISP[name]||name; }
   function maiPerDan(name){ return name==='ナイス新刃' ? 8 : 9; }
   function round05(x){ return Math.round(x*2)/2; }
+  function r2(x){ return Math.round((Number(x)||0)*100)/100; }
   function perBoardMin(mm){ return mm*0.0001375; }
   function danPer4m(name){ return round05(perBoardMin(4000)*maiPerDan(name)); }
   function dan4m(d){ var p=danPer4m(d.name); return p>0? d.min/p : 0; }
@@ -241,8 +241,12 @@
   function fmtHours(min){ return trim(min/60)+'時間'; }
   function trim(n){ return (Math.abs(n-Math.round(n))<0.05)?String(Math.round(n)):n.toFixed(1); }
   function setStatus(s){ $('status').textContent=s; }
+  function byName(nm){ for(var i=0;i<DATA.length;i++) if(DATA[i].name===nm) return DATA[i]; return null; }
+  function saveCache(){ try{ localStorage.setItem('molderDATA', JSON.stringify(DATA)); }catch(e){} }
+  function loadCache(){ try{ var s=localStorage.getItem('molderDATA'); return s?JSON.parse(s):null; }catch(e){ return null; } }
   function guideHours(it){
     if(it.type==='date') return 0;
+    if(it.type==='common') return 5;
     if(it.name.indexOf('15mm')>=0&&it.name.indexOf('フローリング')>=0) return 80;
     return 60;
   }
@@ -266,7 +270,7 @@
     var t=calcTrio(), canAdd=selProduct&&(t.dan>0||t.min>0);
     $('addBtn').disabled=!canAdd;
     if(!selProduct){ $('preview').textContent='↑ まず製品を選んでください'; return; }
-    if(t.dan<=0&&t.min<=0){ $('preview').textContent='段数を入力するか時間を選択'; return; }
+    if(t.dan<=0&&t.min<=0){ $('preview').textContent='時間を選ぶか段数を入力'; return; }
     $('preview').innerHTML='→ <b>'+fmtTime(t.min)+'</b>（'+selLen/1000+'m・'+trim(t.dan)+'段・'+trim(t.mai)+'枚）を <b>'+shortLabel(selProduct)+'</b>＋上下刃 に加算';
   }
   function buildAddPanel(){
@@ -286,7 +290,7 @@
     var c=document.createElement('div');
     c.className='card acc'+(d.type==='common'?' common':'')+(gh>0&&st.k!=='ok'?(' st-'+st.k):'');
     var del=document.createElement('button'); del.className='delcard'; del.textContent='×';
-    del.onclick=function(){ if(confirm('「'+dispName(d.name)+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh); } };
+    del.onclick=function(){ if(confirm('「'+dispName(d.name)+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh).then(function(){saveCache();}); } };
     c.appendChild(del);
     var top=document.createElement('div'); top.className='top';
     var nm=document.createElement('div'); nm.className='nm'; nm.textContent=dispName(d.name);
@@ -294,7 +298,7 @@
     if(st.tag){ var tw=document.createElement('span'); tw.className='tag '+st.tc; tw.textContent=st.tag; nm.appendChild(tw); }
     var nums=document.createElement('div'); nums.className='nums';
     var ncol=(gh>0&&st.k!=='ok')?(' style="color:'+st.col+'"'):'';
-    nums.innerHTML='<span class="n nt"'+ncol+'>'+fmtHours(d.min)+'</span><span class="n nd">'+trim(dan4m(d))+'</span><span class="u">段(4m)</span>';
+    nums.innerHTML='<span class="nt"'+ncol+'>'+fmtHours(d.min)+'</span><span class="nd">'+trim(dan4m(d))+'</span><span class="u">段(4m)</span>';
     top.appendChild(nm); top.appendChild(nums); c.appendChild(top);
     if(gh>0){
       var pct=Math.min(100,ratio*100);
@@ -304,7 +308,7 @@
     var bot=document.createElement('div'); bot.className='bot';
     var g=document.createElement('div'); g.className='guide'; if(gh>0) g.style.color=st.col;
     if(gh>0){
-      var info=(ratio>=1)?('目安'+gh+'h を <b>'+trim(hrs-gh)+'h</b>超過'):('目安'+gh+'h（あと <b>'+trim(gh-hrs)+'h</b>）');
+      var info=(ratio>=1)?('目安'+gh+'時間を <b>'+trim(hrs-gh)+'時間</b>超過'):('目安'+gh+'時間（あと <b>'+trim(gh-hrs)+'時間</b>）');
       g.innerHTML=(st.msg?(st.msg+' '):'')+info+(d.date?' 前'+d.date.slice(5):'');
     }
     var btns=document.createElement('div'); btns.className='btns';
@@ -313,11 +317,21 @@
       var v=prompt('「'+dispName(d.name)+'」の累計時間（時間）を入力',trim(d.min/60));
       if(v===null) return; var h=parseFloat(v);
       if(isNaN(h)||h<0){ alert('数字を入力してください'); return; }
-      setStatus('修正中…'); lastAdd=null; $('undoBtn').classList.remove('show');
-      call('setVals',d.name,0,Math.round(h*60*100)/100,0).then(refresh).then(function(){setStatus('修正しました');});
+      var it=byName(d.name); var prev={dan:it.dan,min:it.min,mai:it.mai};
+      it.dan=0; it.min=r2(h*60); it.mai=0; lastAdd=null; $('undoBtn').classList.remove('show');
+      render(); saveCache(); setStatus('修正しました');
+      call('setVals',d.name,0,r2(h*60),0).then(function(data){ DATA=data; render(); saveCache(); })
+        .catch(function(){ var x=byName(d.name); if(x){x.dan=prev.dan;x.min=prev.min;x.mai=prev.mai;} render(); saveCache(); setStatus('⚠ 修正失敗・戻しました'); });
     };
     var rb=document.createElement('button'); rb.className='minib resb'+(ratio>=1?' hot':''); rb.textContent='🔄交換';
-    rb.onclick=function(){ if(confirm('「'+dispName(d.name)+'」を交換して累計を0に戻しますか?（今日を交換日に記録）')){ setStatus('交換中…'); lastAdd=null; $('undoBtn').classList.remove('show'); call('resetItem',d.name).then(refresh).then(function(){setStatus('交換しました');}); } };
+    rb.onclick=function(){
+      if(!confirm('「'+dispName(d.name)+'」を交換して累計を0に戻しますか?（今日を交換日に記録）')) return;
+      var it=byName(d.name); var prev={dan:it.dan,min:it.min,mai:it.mai,date:it.date};
+      it.dan=0; it.min=0; it.mai=0; it.date=todayStr(); lastAdd=null; $('undoBtn').classList.remove('show');
+      render(); saveCache(); setStatus('交換しました');
+      call('resetItem',d.name).then(function(data){ DATA=data; render(); saveCache(); })
+        .catch(function(){ var x=byName(d.name); if(x){x.dan=prev.dan;x.min=prev.min;x.mai=prev.mai;x.date=prev.date;} render(); saveCache(); setStatus('⚠ 交換失敗・戻しました'); });
+    };
     btns.appendChild(fb); btns.appendChild(rb);
     bot.appendChild(g); bot.appendChild(btns); c.appendChild(bot);
     return c;
@@ -325,17 +339,17 @@
   function dateCard(d){
     var c=document.createElement('div'); c.className='card acc';
     var del=document.createElement('button'); del.className='delcard'; del.textContent='×';
-    del.onclick=function(){ if(confirm('「'+d.name+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh); } };
+    del.onclick=function(){ if(confirm('「'+d.name+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh).then(function(){saveCache();}); } };
     c.appendChild(del);
     var row=document.createElement('div'); row.className='dc';
     row.innerHTML='<div class="nm2"></div><div class="v">'+(d.date||'—')+'</div>';
     row.querySelector('.nm2').textContent=d.name; c.appendChild(row);
     var bs=document.createElement('div'); bs.className='date-btns';
     var today=document.createElement('button'); today.className='today'; today.textContent='今日に更新';
-    today.onclick=function(){ setStatus('更新中…'); call('setDate',d.name,todayStr()).then(refresh).then(function(){setStatus('更新しました');}); };
+    today.onclick=function(){ var it=byName(d.name); var prev=it?it.date:''; if(it) it.date=todayStr(); render(); saveCache(); setStatus('更新しました'); call('setDate',d.name,todayStr()).then(function(data){DATA=data;render();saveCache();}).catch(function(){ var x=byName(d.name); if(x)x.date=prev; render(); setStatus('⚠ 更新失敗'); }); };
     var pick=document.createElement('button'); pick.className='pick'; pick.textContent='📅 日付選択';
     var inp=document.createElement('input'); inp.type='date'; inp.value=toISO(d.date);
-    inp.onchange=function(){ setStatus('更新中…'); call('setDate',d.name,fromISO(inp.value)).then(refresh).then(function(){setStatus('更新しました');}); };
+    inp.onchange=function(){ var nd=fromISO(inp.value); var it=byName(d.name); var prev=it?it.date:''; if(it) it.date=nd; render(); saveCache(); setStatus('更新しました'); call('setDate',d.name,nd).then(function(data){DATA=data;render();saveCache();}).catch(function(){ var x=byName(d.name); if(x)x.date=prev; render(); setStatus('⚠ 更新失敗'); }); };
     pick.appendChild(inp); bs.appendChild(today); bs.appendChild(pick); c.appendChild(bs);
     return c;
   }
@@ -360,20 +374,21 @@
     var t=calcTrio(); if(!selProduct||(t.dan<=0&&t.min<=0)) return;
     var affected={}; affected[selProduct]=1; DATA.forEach(function(d){ if(d.type==='common') affected[d.name]=1; });
     var snap=DATA.filter(function(d){return affected[d.name];}).map(function(d){return {name:d.name,dan:d.dan,min:d.min,mai:d.mai};});
-    $('addBtn').disabled=true; setStatus('追加中…');
-    call('addUsage',selProduct,t.dan,t.min,t.mai).then(function(data){
-      DATA=data; lastAdd=snap; $('undoBtn').classList.add('show');
-      danVal=0; $('danInput').value='0'; $('selTime').value='0'; lastIn='dan';
-      render(); setStatus('✅ '+shortLabel(selProduct)+' に追加（取消可）');
-    }).catch(function(){ setStatus('⚠ 追加失敗。再読込を'); $('addBtn').disabled=false; });
+    DATA.forEach(function(d){ if(affected[d.name]){ d.dan=r2(d.dan+t.dan); d.min=r2(d.min+t.min); d.mai=Math.round(d.mai+t.mai); } });
+    lastAdd=snap; $('undoBtn').classList.add('show');
+    danVal=0; $('danInput').value='0'; $('selTime').value='0'; lastIn='dan';
+    render(); saveCache(); setStatus('✅ '+shortLabel(selProduct)+' に追加（取消可）');
+    call('addUsage',selProduct,t.dan,t.min,t.mai).then(function(data){ DATA=data; render(); saveCache(); })
+      .catch(function(){ snap.forEach(function(s){ var x=byName(s.name); if(x){x.dan=s.dan;x.min=s.min;x.mai=s.mai;} }); lastAdd=null; $('undoBtn').classList.remove('show'); render(); saveCache(); setStatus('⚠ 追加失敗・戻しました'); });
   };
   $('undoBtn').onclick=function(){
     if(!lastAdd) return;
-    setStatus('取消中…'); var snap=lastAdd; lastAdd=null; $('undoBtn').classList.remove('show');
-    Promise.all(snap.map(function(s){ return call('setVals',s.name,s.dan,s.min,s.mai); })).then(function(){
-      return call('getData');
-    }).then(function(data){ DATA=data; render(); setStatus('取り消しました'); })
-    .catch(function(){ setStatus('⚠ 取消失敗。再読込を'); });
+    var snap=lastAdd; lastAdd=null; $('undoBtn').classList.remove('show');
+    snap.forEach(function(s){ var x=byName(s.name); if(x){x.dan=s.dan;x.min=s.min;x.mai=s.mai;} });
+    render(); saveCache(); setStatus('取り消しました');
+    Promise.all(snap.map(function(s){ return call('setVals',s.name,s.dan,s.min,s.mai); })).then(function(results){
+      if(results&&results.length){ DATA=results[results.length-1]; render(); saveCache(); }
+    }).catch(function(){ setStatus('⚠ 取消の保存に失敗。再読込を'); });
   };
   $('gear').onclick=function(){ var on=document.body.classList.toggle('editmode'); $('admin').classList.toggle('show',on); setStatus(on?'編集モード（×で削除）':''); };
   $('specBtn').onclick=function(){ $('specModal').classList.add('show'); };
@@ -383,12 +398,13 @@
     var tp=$('newType').value, nm=$('newName').value;
     if(!nm.trim()){ alert('名前を入力してください'); return; }
     setStatus('追加中…');
-    call('addItem',tp,nm).then(refresh).then(function(){ $('newName').value=''; setStatus('追加しました'); });
+    call('addItem',tp,nm).then(refresh).then(function(){ $('newName').value=''; saveCache(); setStatus('追加しました'); });
   };
   buildTimeOptions();
-  setStatus('読み込み中…');
-  call('getData').then(function(data){ DATA=data; render(); setStatus(''); }).catch(function(){ setStatus('⚠ 読み込み失敗。再読込してください'); });
-  window.addEventListener('focus',function(){ call('getData').then(function(data){ DATA=data; render(); }).catch(function(){}); });
+  var cached=loadCache();
+  if(cached&&cached.length){ DATA=cached; render(); setStatus('更新中…'); }
+  call('getData').then(function(data){ DATA=data; render(); saveCache(); setStatus(''); }).catch(function(){ if(!cached) setStatus('⚠ 読み込み失敗。再読込してください'); else setStatus(''); });
+  window.addEventListener('focus',function(){ if(lastAdd) return; call('getData').then(function(data){ DATA=data; render(); saveCache(); }).catch(function(){}); });
 </script>
 </body>
 </html>
