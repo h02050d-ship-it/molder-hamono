@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<link rel="dns-prefetch" href="https://script.googleusercontent.com">
 <title>モルダー刃物 使用量管理</title>
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -416,7 +419,7 @@
       .catch(function(){ var x=byName(name); if(x){x.dan=prev.dan;x.min=prev.min;x.mai=prev.mai;} render(); saveCache(); setStatus('⚠ 修正失敗・戻しました'); });
   }
   var fixTarget=null;
-  function openFix(name,hours){ fixTarget=name; $('fixTitle').textContent='「'+dispName(name)+'」の累計時間を修正'; $('fixInput').value=hours; $('fixModal').classList.add('show'); setTimeout(function(){ try{ $('fixInput').focus(); $('fixInput').select(); }catch(e){} },60); }
+  function openFix(name,hours){ fixTarget=name; $('fixTitle').textContent='「'+dispName(name)+'」の累計時間を修正'; var inp=$('fixInput'); inp.value=hours; $('fixModal').classList.add('show'); void inp.offsetHeight; try{ inp.focus(); inp.select(); }catch(e){} }
   $('fixCancel').onclick=function(){ $('fixModal').classList.remove('show'); };
   $('fixModal').onclick=function(e){ if(e.target===this) this.classList.remove('show'); };
   $('fixOk').onclick=function(){ var h=parseFloat($('fixInput').value); if(isNaN(h)||h<0){ alert('数字を入力してください'); return; } var nm=fixTarget; $('fixModal').classList.remove('show'); doFix(nm,h); };
@@ -428,10 +431,11 @@
     setStatus('追加中…');
     call('addItem',tp,nm).then(refresh).then(function(){ $('newName').value=''; saveCache(); setStatus('追加しました'); });
   };
+  var pending=call('getData');
   buildTimeOptions();
   var cached=loadCache();
   if(cached&&cached.length){ DATA=cached; render(); setStatus('更新中…'); }
-  call('getData').then(function(data){ DATA=data; render(); saveCache(); setStatus(''); }).catch(function(){ if(!cached) setStatus('⚠ 読み込み失敗。再読込してください'); else setStatus(''); });
+  pending.then(function(data){ DATA=data; render(); saveCache(); setStatus(''); }).catch(function(){ if(!cached) setStatus('⚠ 読み込み失敗。再読込してください'); else setStatus(''); });
   window.addEventListener('focus',function(){ if(lastAdd) return; call('getData').then(function(data){ DATA=data; render(); saveCache(); }).catch(function(){}); });
 </script>
 </body>
