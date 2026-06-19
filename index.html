@@ -188,6 +188,21 @@
   </div>
 </div>
 
+<div class="overlay" id="fixModal">
+  <div class="modal" style="max-width:330px">
+    <h2 id="fixTitle">累計時間を修正</h2>
+    <p style="font-size:12px;color:var(--sub);margin:4px 0 10px">累計の加工時間（時間）を入力してください</p>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input id="fixInput" type="number" inputmode="decimal" step="0.5" min="0" style="flex:1;font-size:26px;font-weight:800;text-align:center;border:2px solid var(--line);border-radius:11px;padding:10px 0;color:var(--ink)">
+      <span style="font-size:15px;font-weight:700;color:var(--sub)">時間</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button id="fixCancel" style="flex:1;background:#fff;color:var(--sub);border:1.5px solid var(--line);border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer">キャンセル</button>
+      <button id="fixOk" style="flex:1.4;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:11px;font-size:14px;font-weight:800;cursor:pointer">確定</button>
+    </div>
+  </div>
+</div>
+
 <script>
   var API='https://script.google.com/macros/s/AKfycbwmcImkSxLl63lzlWAbRcUgfIG9dajZHOoFBtqQn_0z5v3Lg_ydXSOauHHCMeCu3Qfxww/exec';
   var _n=0;
@@ -313,16 +328,7 @@
     }
     var btns=document.createElement('div'); btns.className='btns';
     var fb=document.createElement('button'); fb.className='minib fixb'; fb.textContent='修正';
-    fb.onclick=function(){
-      var v=prompt('「'+dispName(d.name)+'」の累計時間（時間）を入力',trim(d.min/60));
-      if(v===null) return; var h=parseFloat(v);
-      if(isNaN(h)||h<0){ alert('数字を入力してください'); return; }
-      var it=byName(d.name); var prev={dan:it.dan,min:it.min,mai:it.mai};
-      it.dan=0; it.min=r2(h*60); it.mai=0; lastAdd=null; $('undoBtn').classList.remove('show');
-      render(); saveCache(); setStatus('修正しました');
-      call('setVals',d.name,0,r2(h*60),0).then(function(data){ DATA=data; render(); saveCache(); })
-        .catch(function(){ var x=byName(d.name); if(x){x.dan=prev.dan;x.min=prev.min;x.mai=prev.mai;} render(); saveCache(); setStatus('⚠ 修正失敗・戻しました'); });
-    };
+    fb.onclick=function(){ openFix(d.name, trim(d.min/60)); };
     var rb=document.createElement('button'); rb.className='minib resb'+(ratio>=1?' hot':''); rb.textContent='🔄交換';
     rb.onclick=function(){
       if(!confirm('「'+dispName(d.name)+'」を交換して累計を0に戻しますか?（今日を交換日に記録）')) return;
@@ -394,6 +400,20 @@
   $('specBtn').onclick=function(){ $('specModal').classList.add('show'); };
   $('specClose').onclick=function(){ $('specModal').classList.remove('show'); };
   $('specModal').onclick=function(e){ if(e.target===this) this.classList.remove('show'); };
+  function doFix(name,h){
+    var it=byName(name); if(!it) return; var prev={dan:it.dan,min:it.min,mai:it.mai};
+    it.dan=0; it.min=r2(h*60); it.mai=0; lastAdd=null; $('undoBtn').classList.remove('show');
+    render(); saveCache(); setStatus('修正しました');
+    call('setVals',name,0,r2(h*60),0).then(function(data){ DATA=data; render(); saveCache(); })
+      .catch(function(){ var x=byName(name); if(x){x.dan=prev.dan;x.min=prev.min;x.mai=prev.mai;} render(); saveCache(); setStatus('⚠ 修正失敗・戻しました'); });
+  }
+  var fixTarget=null;
+  function openFix(name,hours){ fixTarget=name; $('fixTitle').textContent='「'+dispName(name)+'」の累計時間を修正'; $('fixInput').value=hours; $('fixModal').classList.add('show'); setTimeout(function(){ try{ $('fixInput').focus(); $('fixInput').select(); }catch(e){} },60); }
+  $('fixCancel').onclick=function(){ $('fixModal').classList.remove('show'); };
+  $('fixModal').onclick=function(e){ if(e.target===this) this.classList.remove('show'); };
+  $('fixOk').onclick=function(){ var h=parseFloat($('fixInput').value); if(isNaN(h)||h<0){ alert('数字を入力してください'); return; } var nm=fixTarget; $('fixModal').classList.remove('show'); doFix(nm,h); };
+  $('fixInput').addEventListener('keydown',function(e){ if(e.key==='Enter'){ $('fixOk').click(); } });
+
   $('addItemBtn').onclick=function(){
     var tp=$('newType').value, nm=$('newName').value;
     if(!nm.trim()){ alert('名前を入力してください'); return; }
