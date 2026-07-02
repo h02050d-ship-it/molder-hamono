@@ -447,8 +447,9 @@
     render(); saveCache(); setStatus('✅ '+shortLabel(selProduct)+' に追加（取消可）');
     var pname=selProduct, plen=selLen;
     call('addUsage',pname,t.dan,t.min,t.mai,plen).then(function(data){ setResp(data); lastAddT=(HISTORY[0]?HISTORY[0].t:null); if(lastAddT!=null) $('undoBtn').classList.add('show'); render(); saveCache();
-      var cur=byName(pname);
-      notifyDaiki('【モルダー刃物】追加入力がありました\n品目: '+dispName(pname)+'\n入力: '+fmtTime(t.min)+'（'+plen/1000+'m・'+trim(t.dan)+'段・'+trim(t.mai)+'枚）'+(cur?('\n累計: '+fmtHours(cur.min)):'')+'\nhttps://h02050d-ship-it.github.io/molder-hamono/'); })
+      var cur=byName(pname), cm=null;
+      for(var ci=0;ci<DATA.length;ci++){ if(DATA[ci].type==='common'){ cm=DATA[ci]; break; } }
+      notifyDaiki('【モルダー刃物】追加入力がありました'+(cm?('\n上下の刃: '+fmtHours(cm.min)):'')+'\n品目: '+dispName(pname)+(cur?('（累計 '+fmtHours(cur.min)+'）'):'')+'\n入力: '+fmtTime(t.min)+'（'+plen/1000+'m・'+trim(t.dan)+'段・'+trim(t.mai)+'枚）'+'\nhttps://h02050d-ship-it.github.io/molder-hamono/'); })
       .catch(function(){ snap.forEach(function(s){ var x=byName(s.name); if(x){x.dan=s.dan;x.min=s.min;x.mai=s.mai;} }); lastAddT=null; $('undoBtn').classList.remove('show'); render(); saveCache(); setStatus('⚠ 追加失敗・戻しました'); });
   };
   $('undoBtn').onclick=function(){ undoEntry(lastAddT); };
