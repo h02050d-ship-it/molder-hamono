@@ -261,7 +261,20 @@
   // LINE通知（現場呼出GAS経由で大樹へpush。失敗しても画面動作には影響させない）
   var NOTIFY_URL='https://script.google.com/macros/s/AKfycbxcvQZVi497obS-nRm4MdN0tYtsaTb03n7FLFWy7oZN2vkItKm7oQO9_85WdJYxGjgaiA/exec';
   var NOTIFY_KEY='sk-edNLrUTi9sCrAo1tJmiiA';
+  // URLに ?i=daiki を一度付けて開くとこの端末を「大樹本人」と記憶し、以後LINE通知を送らない（?i=off で解除）
+  var MY_USER=(function(){
+    try{
+      var m=location.search.match(/[?&]i=([^&]*)/);
+      if(m){ var v=decodeURIComponent(m[1]);
+        if(v==='off') localStorage.removeItem('molderUser');
+        else if(v) localStorage.setItem('molderUser', v);
+        if(history.replaceState) history.replaceState(null,'',location.pathname);
+      }
+      return localStorage.getItem('molderUser')||'';
+    }catch(e){ return ''; }
+  })();
   function notifyDaiki(text){
+    if(MY_USER==='daiki') return;
     try{
       fetch(NOTIFY_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({key:NOTIFY_KEY,mode:'notify',target:'daiki',by:'モルダー刃物',text:text})});
     }catch(e){}
@@ -277,6 +290,7 @@
   var $=function(id){ return document.getElementById(id); };
   function shortLabel(name){ return SHORT[name]||name; }
   function dispName(name){ return DISP[name]||name; }
+  function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function maiPerDan(name, len){ if(name==='ナイス新刃') return 8; if(len===1000) return 10; return 9; }
   function round05(x){ return Math.round(x*2)/2; }
   function r2(x){ return Math.round((Number(x)||0)*100)/100; }
@@ -314,8 +328,12 @@
     for(var m=10;m<=480;m+=10){ var o=document.createElement('option'); o.value=m; o.textContent=fmtTime(m); sel.appendChild(o); }
   }
   function buildDanOptions(){
-    var sel=$('danSel'); sel.innerHTML='<option value="0">段数</option>';
-    for(var n=1;n<=40;n++){ var o=document.createElement('option'); o.value=n; o.textContent=n+'段'; sel.appendChild(o); }
+    var sel=$('danSel'); if(!sel) return;
+    var cur=sel.value;
+    sel.innerHTML='<option value="0">段数</option>';
+    var T=perBoardMin(selLen), mpd=maiPerDan(selProduct, selLen);
+    for(var n=1;n<=40;n++){ var o=document.createElement('option'); o.value=n; o.textContent=n+'段（'+fmtTime(round05(n*mpd*T))+'）'; sel.appendChild(o); }
+    if(cur&&cur!=='0') sel.value=cur;
   }
   function calcTrio(){
     var T=perBoardMin(selLen), mpd=maiPerDan(selProduct, selLen), dan=0, min=0, mai=0;
@@ -324,12 +342,12 @@
     return {dan:dan,min:min,mai:mai};
   }
   function updatePreview(){
-    var t=calcTrio(), canAdd=selProduct&&(t.dan>0||t.min>0);
-    $('addBtn').disabled=!canAdd;
+    var t=calcTrio();
+    $('addBtn').disabled=false;
     if(!selProduct){ $('preview').textContent='↑ まず製品を選んでください'; return; }
     var mpd=maiPerDan(selProduct, selLen);
     if(t.dan<=0&&t.min<=0){ $('preview').innerHTML='時間を選ぶか段数を選択　<b>1段＝'+mpd+'枚</b>（'+selLen/1000+'m）'; return; }
-    $('preview').innerHTML='→ <b>'+fmtTime(t.min)+'</b>（'+selLen/1000+'m・'+trim(t.dan)+'段・'+trim(t.mai)+'枚／<b>1段'+mpd+'枚</b>）を <b>'+shortLabel(selProduct)+'</b>＋上下刃 に加算';
+    $('preview').innerHTML='→ <b>'+fmtTime(t.min)+'</b>（'+selLen/1000+'m・'+trim(t.dan)+'段・'+trim(t.mai)+'枚／<b>1段'+mpd+'枚</b>）を <b>'+escHtml(shortLabel(selProduct))+'</b>＋上下刃 に加算';
   }
   function buildAddPanel(){
     var prods=DATA.filter(function(d){return d.type==='product';});
@@ -342,13 +360,14 @@
     LENS.forEach(function(L){ var b=document.createElement('button');
       b.className='lenbtn'+(L.mm===selLen?' on':''); b.textContent=L.label;
       b.onclick=function(){ selLen=L.mm; buildAddPanel(); updatePreview(); }; lr.appendChild(b); });
+    buildDanOptions();
   }
   function accCard(d){
     var gh=guideHours(d), hrs=d.min/60, ratio=gh>0?hrs/gh:0, st=stageOf(ratio);
     var c=document.createElement('div');
     c.className='card acc'+(d.type==='common'?' common':'')+(gh>0&&st.k!=='ok'?(' st-'+st.k):'');
     var del=document.createElement('button'); del.className='delcard'; del.textContent='×';
-    del.onclick=function(){ if(confirm('「'+dispName(d.name)+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh).then(function(){saveCache();}); } };
+    del.onclick=function(){ if(confirm('「'+dispName(d.name)+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh).then(function(){saveCache();}).catch(function(){ setStatus('⚠ 削除失敗。再度お試しください'); }); } };
     c.appendChild(del);
     var top=document.createElement('div'); top.className='top';
     var nm=document.createElement('div'); nm.className='nm'; nm.textContent=dispName(d.name);
@@ -388,7 +407,7 @@
   function dateCard(d){
     var c=document.createElement('div'); c.className='card acc';
     var del=document.createElement('button'); del.className='delcard'; del.textContent='×';
-    del.onclick=function(){ if(confirm('「'+d.name+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh).then(function(){saveCache();}); } };
+    del.onclick=function(){ if(confirm('「'+d.name+'」を削除しますか?')){ setStatus('削除中…'); call('deleteItem',d.name).then(refresh).then(function(){saveCache();}).catch(function(){ setStatus('⚠ 削除失敗。再度お試しください'); }); } };
     c.appendChild(del);
     var row=document.createElement('div'); row.className='dc';
     row.innerHTML='<div class="nm2"></div><div class="v">'+(d.date||'—')+'</div>';
@@ -406,7 +425,6 @@
   function toISO(s){ return s?String(s).split('/').join('-'):''; }
   function fromISO(s){ return s?String(s).split('-').join('/'):''; }
   function render(){
-    if(!selProduct){ var p=DATA.filter(function(d){return d.type==='product';}); if(p.length){ p.sort(function(a,b){var ia=CODE_ORDER.indexOf(a.name),ib=CODE_ORDER.indexOf(b.name);return (ia<0?99:ia)-(ib<0?99:ib);}); selProduct=p[0].name; } }
     buildAddPanel(); updatePreview();
     var com=$('commons'); com.innerHTML=''; DATA.filter(function(d){return d.type==='common';}).forEach(function(d){ com.appendChild(accCard(d)); });
     var pr=$('products'); pr.innerHTML='';
@@ -427,7 +445,7 @@
       var when=sameDay? hm : ((d.getMonth()+1)+'/'+d.getDate()+' '+hm);
       var lenm=h.len?(h.len/1000+'m'):'';
       var row=document.createElement('div'); row.className='histrow';
-      row.innerHTML='<span class="ht">'+when+'</span><span class="hn">'+dispName(h.name)+'</span><span class="hv">'+trim(h.dan)+'段'+(lenm?'('+lenm+')':'')+' / '+fmtTime(h.min)+'</span>';
+      row.innerHTML='<span class="ht">'+when+'</span><span class="hn">'+escHtml(dispName(h.name))+'</span><span class="hv">'+trim(h.dan)+'段'+(lenm?'('+lenm+')':'')+' / '+fmtTime(h.min)+'</span>';
       var ub=document.createElement('button'); ub.className='histundo'; ub.textContent='取消';
       var dsc=when+' '+dispName(h.name)+' '+trim(h.dan)+'段'+(lenm?'('+lenm+')':'')+' / '+fmtTime(h.min); var ht=h.t;
       ub.onclick=function(){ if(confirm('この追加を取り消しますか?\n'+dsc+'\n\n各刃物の累計から差し引かれます。')) undoEntry(ht); };
@@ -439,7 +457,9 @@
   $('danSel').onchange=function(){ danVal=parseInt(this.value,10)||0; lastIn='dan'; if(danVal>0) $('selTime').value='0'; updatePreview(); };
   $('selTime').onchange=function(){ lastIn='time'; if(this.value!=='0'){ danVal=0; $('danSel').value='0'; } updatePreview(); };
   $('addBtn').onclick=function(){
-    var t=calcTrio(); if(!selProduct||(t.dan<=0&&t.min<=0)) return;
+    var t=calcTrio();
+    if(!selProduct){ alert('先に製品（F・P・F(12)・N・S）を選んでください'); return; }
+    if(t.dan<=0&&t.min<=0){ alert('時間か段数を選んでください'); return; }
     var affected={}; affected[selProduct]=1; DATA.forEach(function(d){ if(d.type==='common') affected[d.name]=1; });
     var snap=DATA.filter(function(d){return affected[d.name];}).map(function(d){return {name:d.name,dan:d.dan,min:d.min,mai:d.mai};});
     DATA.forEach(function(d){ if(affected[d.name]){ d.dan=r2(d.dan+t.dan); d.min=r2(d.min+t.min); d.mai=Math.round(d.mai+t.mai); } });
@@ -490,7 +510,7 @@
     var tp=$('newType').value, nm=$('newName').value;
     if(!nm.trim()){ alert('名前を入力してください'); return; }
     setStatus('追加中…');
-    call('addItem',tp,nm).then(refresh).then(function(){ $('newName').value=''; saveCache(); setStatus('追加しました'); });
+    call('addItem',tp,nm).then(refresh).then(function(){ $('newName').value=''; saveCache(); setStatus('追加しました'); }).catch(function(){ setStatus('⚠ 追加失敗。通信を確認して再度お試しください'); });
   };
   var pending=call('getData');
   buildTimeOptions(); buildDanOptions();
