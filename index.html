@@ -332,12 +332,12 @@
     var cur=sel.value;
     sel.innerHTML='<option value="0">段数</option>';
     var T=perBoardMin(selLen), mpd=maiPerDan(selProduct, selLen);
-    for(var n=1;n<=40;n++){ var o=document.createElement('option'); o.value=n; o.textContent=n+'段（'+fmtTime(round05(n*mpd*T))+'）'; sel.appendChild(o); }
+    for(var n=1;n<=40;n++){ var o=document.createElement('option'); o.value=n; o.textContent=n+'段（'+fmtTime(Math.ceil(n*mpd*T))+'）'; sel.appendChild(o); }
     if(cur&&cur!=='0') sel.value=cur;
   }
   function calcTrio(){
     var T=perBoardMin(selLen), mpd=maiPerDan(selProduct, selLen), dan=0, min=0, mai=0;
-    if(lastIn==='dan'){ dan=danVal; mai=dan*mpd; min=round05(mai*T); }
+    if(lastIn==='dan'){ dan=danVal; mai=dan*mpd; min=Math.ceil(mai*T); }
     else { min=round05(parseFloat($('selTime').value)||0); mai=T>0?min/T:0; dan=mai/mpd; }
     return {dan:dan,min:min,mai:mai};
   }
