@@ -114,6 +114,10 @@
   .histempty{font-size:11px;color:var(--sub);padding:4px 0}
   .histundo{flex:none;border:1px solid var(--reset);color:var(--reset);background:#fff;border-radius:6px;font-size:10.5px;font-weight:800;padding:4px 9px;cursor:pointer}
   .histundo:active{background:var(--reset);color:#fff}
+  .histmore{display:block;width:100%;border:0;background:none;color:var(--accent-d);font-size:11px;font-weight:800;padding:6px 0 5px;cursor:pointer;text-align:center}
+  .histmore:active{opacity:.6}
+  .kaizenlink{display:block;text-align:center;background:#fff;border:1.5px dashed #059669;color:#047857;border-radius:9px;padding:8px;font-size:12px;font-weight:800;text-decoration:none;margin-bottom:5px;box-shadow:var(--shadow)}
+  .kaizenlink:active{background:#e7f4ec}
   .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;align-items:center;justify-content:center;padding:12px}
   .overlay.show{display:flex}
   .modal{background:#fff;border-radius:13px;max-width:520px;width:100%;max-height:86vh;overflow:auto;padding:15px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
@@ -164,6 +168,7 @@
 
   <div class="label">最近の追加</div>
   <div id="histList" class="histbox"></div>
+  <a class="kaizenlink" href="https://h02050d-ship-it.github.io/kaizen/">🪚 モルダー修正ボードを開く（修正行き枚数の記録・修正率）</a>
 
   <div class="note">&#9888; 目安は<b style="color:#7a5418">目安</b>。オス・メスが<b>焦げず・荒れてなければ</b>超えても延長OK。<b>焦げ・割れ</b>は早めに交換。</div>
 
@@ -434,11 +439,12 @@
     var dt=$('dates'); dt.innerHTML=''; DATA.filter(function(d){return d.type==='date';}).forEach(function(d){ dt.appendChild(dateCard(d)); });
     renderHistory();
   }
+  var histExpanded=false;
   function renderHistory(){
     var el=$('histList'); if(!el) return; el.innerHTML='';
     if(!HISTORY||!HISTORY.length){ el.innerHTML='<div class="histempty">まだ追加履歴はありません</div>'; return; }
     var now=new Date();
-    HISTORY.slice(0,3).forEach(function(h){
+    HISTORY.slice(0, histExpanded?10:3).forEach(function(h){
       var d=new Date(h.t);
       var hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
       var sameDay=(d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate());
@@ -452,6 +458,12 @@
       row.appendChild(ub);
       el.appendChild(row);
     });
+    if(HISTORY.length>3){
+      var more=document.createElement('button'); more.className='histmore';
+      more.textContent=histExpanded?('▲ 3件だけ表示'):('▼ 全'+Math.min(HISTORY.length,10)+'件を表示');
+      more.onclick=function(){ histExpanded=!histExpanded; renderHistory(); };
+      el.appendChild(more);
+    }
   }
   function refresh(data){ if(data) setResp(data); render(); return DATA; }
   $('danSel').onchange=function(){ danVal=parseInt(this.value,10)||0; lastIn='dan'; if(danVal>0) $('selTime').value='0'; updatePreview(); };
