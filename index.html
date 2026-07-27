@@ -291,7 +291,7 @@
   var DISP={'ナイス新刃':'ナイスオリジナル'};
   var DATA=[];
   var HISTORY=[];
-  var selProduct=null, selLen=4000, lastIn='dan', danVal=0, lastAddT=null;
+  var selProduct=null, selLen=0, lastIn='dan', danVal=0, lastAddT=null;
   var $=function(id){ return document.getElementById(id); };
   function shortLabel(name){ return SHORT[name]||name; }
   function dispName(name){ return DISP[name]||name; }
@@ -337,7 +337,7 @@
     var cur=sel.value;
     sel.innerHTML='<option value="0">段数</option>';
     var T=perBoardMin(selLen), mpd=maiPerDan(selProduct, selLen);
-    for(var n=1;n<=40;n++){ var o=document.createElement('option'); o.value=n; o.textContent=n+'段（'+fmtTime(Math.ceil(n*mpd*T))+'）'; sel.appendChild(o); }
+    for(var n=1;n<=40;n++){ var o=document.createElement('option'); o.value=n; o.textContent=selLen? n+'段（'+fmtTime(Math.ceil(n*mpd*T))+'）' : n+'段'; sel.appendChild(o); }
     if(cur&&cur!=='0') sel.value=cur;
   }
   function calcTrio(){
@@ -350,6 +350,7 @@
     var t=calcTrio();
     $('addBtn').disabled=false;
     if(!selProduct){ $('preview').textContent='↑ まず製品を選んでください'; return; }
+    if(!selLen){ $('preview').textContent='↑ 長さ（1m〜4m）を選んでください'; return; }
     var mpd=maiPerDan(selProduct, selLen);
     if(t.dan<=0&&t.min<=0){ $('preview').innerHTML='時間を選ぶか段数を選択　<b>1段＝'+mpd+'枚</b>（'+selLen/1000+'m）'; return; }
     $('preview').innerHTML='→ <b>'+fmtTime(t.min)+'</b>（'+selLen/1000+'m・'+trim(t.dan)+'段・'+trim(t.mai)+'枚／<b>1段'+mpd+'枚</b>）を <b>'+escHtml(shortLabel(selProduct))+'</b>＋上下刃 に加算';
@@ -471,6 +472,7 @@
   $('addBtn').onclick=function(){
     var t=calcTrio();
     if(!selProduct){ alert('先に製品（F・P・F(12)・N・S）を選んでください'); return; }
+    if(!selLen){ alert('長さ（1m〜4m）を選んでください'); return; }
     if(t.dan<=0&&t.min<=0){ alert('時間か段数を選んでください'); return; }
     var affected={}; affected[selProduct]=1; DATA.forEach(function(d){ if(d.type==='common') affected[d.name]=1; });
     var snap=DATA.filter(function(d){return affected[d.name];}).map(function(d){return {name:d.name,dan:d.dan,min:d.min,mai:d.mai};});
