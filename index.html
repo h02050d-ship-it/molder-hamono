@@ -266,6 +266,8 @@
   // LINE通知（現場呼出GAS経由で大樹へpush。失敗しても画面動作には影響させない）
   var NOTIFY_URL='https://script.google.com/macros/s/AKfycbxcvQZVi497obS-nRm4MdN0tYtsaTb03n7FLFWy7oZN2vkItKm7oQO9_85WdJYxGjgaiA/exec';
   var NOTIFY_KEY='sk-edNLrUTi9sCrAo1tJmiiA';
+  // モルダー軸位置管理GAS（刃物番号の連動記録先）
+  var AXIS_API='https://script.google.com/macros/s/AKfycbzJlKBj3Jn5TAJcL2iSyd5dK7MIqIuJVHlsIHU7YlTb5-vkXRHIMVQ2Zkzgb8j91btZ/exec';
   // URLに ?i=daiki を一度付けて開くとこの端末を「大樹本人」と記憶し、以後LINE通知を送らない（?i=off で解除）
   var MY_USER=(function(){
     try{
@@ -400,11 +402,25 @@
     var rb=document.createElement('button'); rb.className='minib resb'+(ratio>=1?' hot':''); rb.textContent='🔄交換';
     rb.onclick=function(){
       if(!confirm('「'+dispName(d.name)+'」を交換して累計を0に戻しますか?（今日を交換日に記録）')) return;
+      // フローリング(オス・メス)は新しい刃物番号も入力→モルダー軸位置管理へ自動記録
+      var isFlo=(d.name==='15mmフローリング'||d.name==='12mmフローリング');
+      var hamonoNum='';
+      if(isFlo){
+        var pv=prompt('新しい刃物番号を入力してください\n（モルダー軸位置管理の'+(d.name==='12mmフローリング'?'F（12mm)':'F')+'に今日の日付で記録されます。空欄なら記録なし）','');
+        if(pv===null) return; // キャンセル＝交換も中止
+        hamonoNum=pv.trim();
+      }
       var it=byName(d.name); var prev={dan:it.dan,min:it.min,mai:it.mai,date:it.date};
       it.dan=0; it.min=0; it.mai=0; it.date=todayStr(); lastAddT=null; $('undoBtn').classList.remove('show');
       render(); saveCache(); setStatus('交換しました');
       call('resetItem',d.name).then(function(data){ setResp(data); render(); saveCache(); })
         .catch(function(){ var x=byName(d.name); if(x){x.dan=prev.dan;x.min=prev.min;x.mai=prev.mai;x.date=prev.date;} render(); saveCache(); setStatus('⚠ 交換失敗・戻しました'); });
+      if(isFlo&&hamonoNum){
+        try{
+          fetch(AXIS_API+'?action=sethamono&key=hamono-sync-2026&sheet='+(d.name==='12mmフローリング'?'F12':'F')+'&num='+encodeURIComponent(hamonoNum),{mode:'no-cors'});
+        }catch(e){}
+        notifyDaiki('【モルダー刃物】'+dispName(d.name)+'を交換しました\n新しい刃物番号: '+hamonoNum+'\n（モルダー軸位置管理にも記録）');
+      }
     };
     btns.appendChild(fb); btns.appendChild(rb);
     bot.appendChild(g); bot.appendChild(btns); c.appendChild(bot);
