@@ -281,7 +281,9 @@
       return localStorage.getItem('molderUser')||'';
     }catch(e){ return ''; }
   })();
+  var NOTIFY_ENABLED=false; /* 2026-09-07 本人指示「モルダーの入力は通知しなくていい」→交換/取消のLINE通知を停止。再開はtrueに */
   function notifyDaiki(text){
+    if(!NOTIFY_ENABLED) return;
     if(MY_USER==='daiki') return;
     try{
       fetch(NOTIFY_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({key:NOTIFY_KEY,mode:'notify',target:'daiki',by:'モルダー刃物',text:text})});
